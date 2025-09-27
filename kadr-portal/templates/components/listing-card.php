@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 /** @var array<string, mixed> $listing */
-
 $thumb = isset($listing['main_image_thumb']) && is_string($listing['main_image_thumb'])
     ? $listing['main_image_thumb']
     : null;
@@ -27,7 +26,6 @@ $fullImage = isset($listing['main_image_path']) && is_string($listing['main_imag
             </a>
         <?php endif; ?>
     </div>
-
     <h2>
         <a href="/listings/<?= htmlspecialchars((string) $listing['id'], ENT_QUOTES, 'UTF-8'); ?>">
             <?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8'); ?>

@@ -19,6 +19,7 @@ $images = isset($listing['images']) && is_array($listing['images']) ? $listing['
     <title><?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8'); ?> — Kadr Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/comments.css">
 </head>
 <body>
 <?php require __DIR__ . '/../../components/header.php'; ?>
@@ -65,7 +66,6 @@ $images = isset($listing['images']) && is_array($listing['images']) ? $listing['
                 </button>
             </section>
         <?php endif; ?>
-  
         <p><?= nl2br(htmlspecialchars($listing['description'], ENT_QUOTES, 'UTF-8')); ?></p>
         <div class="listing-detail-actions">
             <a class="button button-secondary" href="/listings">Вернуться к списку</a>
@@ -78,7 +78,15 @@ $images = isset($listing['images']) && is_array($listing['images']) ? $listing['
             <?php endif; ?>
         </div>
     </article>
+    <?php
+    $listingId = (int) $listing['id'];
+    $isAuthenticated = is_authenticated();
+
+    require __DIR__ . '/../components/comments.php';
+    require __DIR__ . '/../components/comment-form.php';
+    ?>
 </main>
 <script src="/assets/js/listings.js" defer></script>
+<script src="/assets/js/comments.js" defer></script>
 </body>
 </html>

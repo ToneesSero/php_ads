@@ -113,7 +113,6 @@ $baseQuery = http_build_query($filterQuery);
         <p class="listing-empty">Пока нет объявлений. Станьте первым, кто добавит предложение!</p>
     <?php endif; ?>
 </main>
-  
 <script>
 <?php require __DIR__ . '/../components/listing-card-template.js'; ?>
 </script>
