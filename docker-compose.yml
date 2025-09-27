@@ -39,7 +39,7 @@ services:
       - ./kadr-portal/public:/var/www/html/public
       - ./kadr-portal/docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
-      - "8080:80"
+      - "8081:80"  
     depends_on:
       - php
 
