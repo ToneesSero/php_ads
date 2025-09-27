@@ -14,7 +14,9 @@ $csrfToken = csrf_token();
         <a class="logo" href="/">Kadr Portal</a>
         <nav class="main-nav">
             <ul>
+                <li class="nav-item"><a href="/listings">Объявления</a></li>
                 <?php if (is_authenticated() && $user !== null) : ?>
+                    <li class="nav-item"><a href="/listings/create">Добавить объявление</a></li>
                     <li class="nav-item">Здравствуйте, <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8'); ?></li>
                     <li class="nav-item">
                         <form action="/logout" method="post" class="logout-form">

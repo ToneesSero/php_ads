@@ -8,3 +8,4 @@ return [
     'debug' => (bool) getenv('APP_DEBUG'),
     'base_url' => getenv('APP_URL') ?: 'http://localhost:8081',
 ];
+

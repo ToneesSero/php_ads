@@ -23,7 +23,13 @@
    ```
 4. Проверьте работу главной страницы:
    ```bash
-   curl http://localhost:8080
+
+   curl http://localhost:8081
+   ```
+5. Убедитесь, что список объявлений открывается:
+   ```bash
+   curl http://localhost:8081/listings
+
    ```
 
 ## Полезные команды
@@ -34,6 +40,22 @@ make migrate  # Применить миграцию 001_init.sql
 make logs     # Логи всех сервисов
 make shell    # Shell внутри PHP контейнера
 make db-shell # Консоль psql
+```
+
+## Проверка функционала объявлений
+
+```bash
+# Список объявлений с фильтрами
+curl "http://localhost:8081/listings?search=php"
+
+# Карточка конкретного объявления
+curl http://localhost:8081/listings/1
+
+# Создание объявления (требуется авторизованный пользователь)
+curl -X POST http://localhost:8081/listings \
+  -d "title=Test" \
+  -d "description=Test description" \
+  -d "price=1000"
 ```
 
 ## Структура

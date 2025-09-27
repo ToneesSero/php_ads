@@ -79,3 +79,65 @@ function validate_login(array $input): array
         ],
     ];
 }
+
+/**
+ * Validate listing form data for creation or update.
+ *
+ * @param array<string, string> $input
+ *
+ * @return array{errors: array<string, string>, data: array<string, mixed>}
+ */
+function validate_listing(array $input): array
+{
+    $title = trim($input['title'] ?? '');
+    $description = trim($input['description'] ?? '');
+    $priceRaw = str_replace(',', '.', trim($input['price'] ?? ''));
+    $categoryRaw = trim($input['category_id'] ?? '');
+
+    $errors = [];
+
+    if ($title === '') {
+        $errors['title'] = 'Введите заголовок объявления.';
+    } elseif (mb_strlen($title) > 255) {
+        $errors['title'] = 'Заголовок не должен превышать 255 символов.';
+    }
+
+    if ($description === '') {
+        $errors['description'] = 'Добавьте описание объявления.';
+    }
+
+    $price = null;
+
+    if ($priceRaw === '') {
+        $errors['price'] = 'Укажите цену.';
+    } elseif (!is_numeric($priceRaw)) {
+        $errors['price'] = 'Цена должна быть числом.';
+    } else {
+        $price = round((float) $priceRaw, 2);
+
+        if ($price < 0) {
+            $errors['price'] = 'Цена не может быть отрицательной.';
+        }
+    }
+
+    $categoryId = null;
+
+    if ($categoryRaw !== '') {
+        if (!ctype_digit($categoryRaw)) {
+            $errors['category_id'] = 'Категория указана неверно.';
+        } else {
+            $categoryId = (int) $categoryRaw;
+        }
+    }
+
+    return [
+        'errors' => $errors,
+        'data' => [
+            'title' => $title,
+            'description' => $description,
+            'price' => $price,
+            'category_id' => $categoryId,
+        ],
+    ];
+}
+
