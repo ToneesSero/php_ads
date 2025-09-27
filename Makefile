@@ -18,3 +18,4 @@ $(COMPOSE) exec php sh
 db-shell:
 $(COMPOSE) exec db psql -U $${DB_USER:-app} -d $${DB_NAME:-app}
 .PHONY: up down migrate logs shell db-shell
+

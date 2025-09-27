@@ -40,8 +40,10 @@ services:
       - ./kadr-portal/docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     ports:
       - "8081:80"
+
     depends_on:
       - php
 
 volumes:
   db_data:
+

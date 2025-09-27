@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+// Настройка сессии
 $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
 session_set_cookie_params([
     'lifetime' => 0,
@@ -14,6 +15,8 @@ session_set_cookie_params([
 
 session_start();
 
+
+// Подключение всех необходимых файлов
 require_once __DIR__ . '/../helpers/router.php';
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../helpers/csrf.php';
@@ -35,11 +38,14 @@ $router->get('/', static function (): void {
     echo 'Welcome to Kadr Portal';
 });
 
+
+// Маршруты авторизации
 $router->get('/login', [$authController, 'showLogin']);
 $router->post('/login', [$authController, 'login']);
 $router->get('/register', [$authController, 'showRegister']);
 $router->post('/register', [$authController, 'register']);
 $router->post('/logout', [$authController, 'logout']);
+
 
 $router->get('/listings', [$listingController, 'index']);
 $router->get('/listings/create', [$listingController, 'create']);
@@ -50,3 +56,4 @@ $router->post('/listings/{id}/update', [$listingController, 'update']);
 $router->post('/listings/{id}/delete', [$listingController, 'destroy']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
+

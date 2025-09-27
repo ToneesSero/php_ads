@@ -140,3 +140,4 @@ function validate_listing(array $input): array
         ],
     ];
 }
+
