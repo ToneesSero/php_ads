@@ -11,6 +11,7 @@ declare(strict_types=1);
 /** @var int $uploadLimit */
 /** @var int $uploadMaxSize */
 
+
 $titleValue = $old['title'] ?? $listing['title'];
 $descriptionValue = $old['description'] ?? $listing['description'];
 $priceValue = $old['price'] ?? number_format((float) $listing['price'], 2, '.', '');
@@ -18,6 +19,7 @@ $categoryValue = $old['category_id'] ?? (string) ($listing['category_id'] ?? '')
 $uploadedImages = $uploadedImages ?? [];
 $uploadLimit = $uploadLimit ?? 5;
 $uploadMaxSize = $uploadMaxSize ?? 5 * 1024 * 1024;
+
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -82,6 +84,7 @@ $uploadMaxSize = $uploadMaxSize ?? 5 * 1024 * 1024;
         </div>
     </form>
 </main>
+
 <script src="/assets/js/upload.js" defer></script>
 <script src="/assets/js/listings.js" defer></script>
 </body>

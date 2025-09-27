@@ -65,6 +65,7 @@ $images = isset($listing['images']) && is_array($listing['images']) ? $listing['
                 </button>
             </section>
         <?php endif; ?>
+  
         <p><?= nl2br(htmlspecialchars($listing['description'], ENT_QUOTES, 'UTF-8')); ?></p>
         <div class="listing-detail-actions">
             <a class="button button-secondary" href="/listings">Вернуться к списку</a>

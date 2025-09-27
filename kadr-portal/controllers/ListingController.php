@@ -141,7 +141,6 @@ SQL;
         }
 
         unset($listing);
-
         $categories = $this->getCategories();
 
         $currentFilters = [
@@ -286,7 +285,6 @@ SQL;
         $uploadedImages = get_listing_uploads();
         $uploadLimit = get_listing_upload_limit();
         $uploadMaxSize = get_listing_upload_max_size();
-
         header('Content-Type: text/html; charset=utf-8');
         require __DIR__ . '/../templates/listings/edit.php';
     }
