@@ -1,0 +1,98 @@
+.image-upload {
+    margin-top: 1rem;
+}
+
+.image-upload__dropzone {
+    border: 2px dashed #ced4da;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #f8f9fa;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.image-upload__dropzone--active {
+    border-color: #007bff;
+    background-color: #e9f2ff;
+}
+
+.image-upload__dropzone p {
+    margin: 0 0 0.75rem;
+    color: #495057;
+}
+
+.image-upload__hint {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.image-upload__preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.image-upload__item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.image-upload__item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-upload__item--loading {
+    font-style: italic;
+    background: repeating-linear-gradient(45deg, #f1f3f5, #f1f3f5 10px, #e9ecef 10px, #e9ecef 20px);
+    animation: image-upload-loading 1s linear infinite;
+}
+
+@keyframes image-upload-loading {
+    from {
+        background-position: 0 0;
+    }
+    to {
+        background-position: 40px 40px;
+    }
+}
+
+.image-upload__remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.image-upload__remove:hover,
+.image-upload__remove:focus {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 600px) {
+    .image-upload__preview {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+}
