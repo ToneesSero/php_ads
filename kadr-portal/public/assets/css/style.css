@@ -1,0 +1,268 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+h1,
+h2,
+h3 {
+    font-weight: 600;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e1e1e1;
+    border-radius: 6px;
+    padding: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.site-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #222222;
+    text-decoration: none;
+}
+
+.main-nav ul {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item a,
+.nav-item button {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-item button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.auth-container {
+    background-color: #ffffff;
+    margin-top: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 0.75rem;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.button {
+    padding: 0.75rem 1.5rem;
+    background-color: #1a73e8;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.button:hover {
+    background-color: #1558b0;
+}
+
+.button-link {
+    background: none;
+    color: #1a73e8;
+    padding: 0;
+}
+
+.form-error {
+    color: #d93025;
+    font-size: 0.875rem;
+    min-height: 1rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.alert-danger {
+    background-color: #fdecea;
+    border: 1px solid #f5c6cb;
+    color: #b71c1c;
+}
+
+.auth-switch {
+    margin-top: 1rem;
+}
+
+.logout-form {
+    display: inline;
+}
+
+.listings-page {
+    margin-top: 2rem;
+}
+
+.listings-header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.listings-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.listings-filter {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e1e1;
+}
+
+.listings-filter .form-group {
+    margin: 0;
+}
+
+.listings-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.listing-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.listing-card h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.listing-card-meta {
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.listing-card-actions {
+    margin-top: auto;
+}
+
+.listing-empty {
+    margin-top: 2rem;
+    text-align: center;
+    color: #6b7280;
+}
+
+.listing-detail {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+    border: 1px solid #e5e7eb;
+    margin-top: 2rem;
+}
+
+.listing-detail header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.listing-detail-meta {
+    color: #6b7280;
+    font-size: 0.9rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.listing-detail-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.button-secondary {
+    background-color: #6b7280;
+}
+
+.button-secondary:hover {
+    background-color: #4b5563;
+}
+
+.text-muted {
+    color: #6b7280;
+}
