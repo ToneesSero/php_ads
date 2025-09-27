@@ -67,6 +67,7 @@ $uploadMaxSize = $uploadMaxSize ?? 5 * 1024 * 1024;
                 <p class="form-error"><?= htmlspecialchars($errors['category_id'], ENT_QUOTES, 'UTF-8'); ?></p>
             <?php endif; ?>
         </div>
+
         <section class="form-group">
             <h2>Фотографии</h2>
             <?php require __DIR__ . '/../components/image-upload.php'; ?>
@@ -77,6 +78,7 @@ $uploadMaxSize = $uploadMaxSize ?? 5 * 1024 * 1024;
         </div>
     </form>
 </main>
+
 <script src="/assets/js/upload.js" defer></script>
 <script src="/assets/js/listings.js" defer></script>
 </body>
