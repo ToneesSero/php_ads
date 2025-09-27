@@ -1,0 +1,43 @@
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.loading-indicator[hidden] {
+    display: none !important;
+}
+
+.loading-indicator .spinner {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    border: 3px solid rgba(59, 130, 246, 0.2);
+    border-top-color: #3b82f6;
+    animation: spinner-rotate 0.75s linear infinite;
+}
+
+@keyframes spinner-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-error {
+    margin-top: 1rem;
+    text-align: center;
+    color: #dc2626;
+    font-size: 0.95rem;
+}
+
+.loading-error[hidden] {
+    display: none !important;
+}
+
+[data-pagination].is-hidden {
+    display: none !important;
+}
