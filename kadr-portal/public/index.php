@@ -15,23 +15,30 @@ session_set_cookie_params([
 
 session_start();
 
-
 // Подключение всех необходимых файлов
+
 require_once __DIR__ . '/../helpers/router.php';
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../helpers/csrf.php';
 require_once __DIR__ . '/../helpers/validation.php';
+
+require_once __DIR__ . '/../helpers/image.php';
+require_once __DIR__ . '/../helpers/upload.php';
 require_once __DIR__ . '/../helpers/database.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/ListingController.php';
+require_once __DIR__ . '/../controllers/UploadController.php';
 
 use KadrPortal\Controllers\AuthController;
 use KadrPortal\Controllers\ListingController;
+use KadrPortal\Controllers\UploadController;
 use KadrPortal\Helpers\Router;
 
 $router = new Router();
 $authController = new AuthController();
 $listingController = new ListingController();
+$uploadController = new UploadController();
+
 
 $router->get('/', static function (): void {
     header('Content-Type: text/plain; charset=utf-8');
@@ -54,6 +61,9 @@ $router->get('/listings/{id}', [$listingController, 'show']);
 $router->get('/listings/{id}/edit', [$listingController, 'edit']);
 $router->post('/listings/{id}/update', [$listingController, 'update']);
 $router->post('/listings/{id}/delete', [$listingController, 'destroy']);
+
+$router->post('/api/upload', [$uploadController, 'store']);
+$router->post('/api/upload/delete', [$uploadController, 'destroy']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
 

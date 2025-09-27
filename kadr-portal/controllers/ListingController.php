@@ -13,6 +13,11 @@ use function KadrPortal\Helpers\current_user;
 use function KadrPortal\Helpers\db;
 use function KadrPortal\Helpers\flash_old_input;
 use function KadrPortal\Helpers\get_flash;
+
+use function KadrPortal\Helpers\get_listing_upload_limit;
+use function KadrPortal\Helpers\get_listing_upload_max_size;
+use function KadrPortal\Helpers\get_listing_uploads;
+
 use function KadrPortal\Helpers\is_authenticated;
 use function KadrPortal\Helpers\old_input;
 use function KadrPortal\Helpers\reset_csrf_token;
@@ -173,6 +178,11 @@ SQL;
         $csrfToken = csrf_token();
         $categories = $this->getCategories();
 
+        $uploadedImages = get_listing_uploads();
+        $uploadLimit = get_listing_upload_limit();
+        $uploadMaxSize = get_listing_upload_max_size();
+
+
         header('Content-Type: text/html; charset=utf-8');
         require __DIR__ . '/../templates/listings/create.php';
     }
@@ -260,6 +270,10 @@ SQL;
         $old = old_input();
         $categories = $this->getCategories();
         $csrfToken = csrf_token();
+        $uploadedImages = get_listing_uploads();
+        $uploadLimit = get_listing_upload_limit();
+        $uploadMaxSize = get_listing_upload_max_size();
+
 
         header('Content-Type: text/html; charset=utf-8');
         require __DIR__ . '/../templates/listings/edit.php';

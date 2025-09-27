@@ -6,6 +6,13 @@ declare(strict_types=1);
 /** @var array<string, string> $old */
 /** @var string $csrfToken */
 /** @var array<int, array<string, mixed>> $categories */
+/** @var array<int, array{id:string,path:string,thumb:string}> $uploadedImages */
+/** @var int $uploadLimit */
+/** @var int $uploadMaxSize */
+
+$uploadedImages = $uploadedImages ?? [];
+$uploadLimit = $uploadLimit ?? 5;
+$uploadMaxSize = $uploadMaxSize ?? 5 * 1024 * 1024;
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -14,6 +21,7 @@ declare(strict_types=1);
     <title>Новое объявление — Kadr Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/upload.css">
 </head>
 <body>
 <?php require __DIR__ . '/../../components/header.php'; ?>
@@ -59,12 +67,19 @@ declare(strict_types=1);
                 <p class="form-error"><?= htmlspecialchars($errors['category_id'], ENT_QUOTES, 'UTF-8'); ?></p>
             <?php endif; ?>
         </div>
+
+        <section class="form-group">
+            <h2>Фотографии</h2>
+            <?php require __DIR__ . '/../components/image-upload.php'; ?>
+        </section>
         <div class="form-actions">
             <button type="submit" class="button">Сохранить</button>
             <a href="/listings" class="button button-secondary">Отмена</a>
         </div>
     </form>
 </main>
+
+<script src="/assets/js/upload.js" defer></script>
 <script src="/assets/js/listings.js" defer></script>
 </body>
 </html>
