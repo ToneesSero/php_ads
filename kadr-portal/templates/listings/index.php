@@ -44,6 +44,7 @@ $baseQuery = http_build_query($filterQuery);
     <title>Объявления — Kadr Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/loading.css">
 </head>
 <body>
 <?php require __DIR__ . '/../../components/header.php'; ?>
@@ -92,6 +93,11 @@ $baseQuery = http_build_query($filterQuery);
                 <?php require __DIR__ . '/../components/listing-card.php'; ?>
             <?php endforeach; ?>
         </section>
+        <div class="loading-indicator" data-loading-indicator hidden>
+            <div class="spinner" aria-hidden="true"></div>
+            <span>Загружаем ещё объявления…</span>
+        </div>
+        <p class="loading-error" data-loading-error hidden>Не удалось загрузить объявления. Попробуйте обновить страницу.</p>
         <div class="form-actions" data-pagination>
             <?php if ($page > 1) : ?>
                 <?php $prevQuery = http_build_query(array_merge($filterQuery, ['page' => $page - 1])); ?>
@@ -102,10 +108,16 @@ $baseQuery = http_build_query($filterQuery);
                 <a class="button" href="/listings?<?= htmlspecialchars($nextQuery, ENT_QUOTES, 'UTF-8'); ?>">Следующая</a>
             <?php endif; ?>
         </div>
+        <div data-scroll-sentinel aria-hidden="true"></div>
     <?php else : ?>
         <p class="listing-empty">Пока нет объявлений. Станьте первым, кто добавит предложение!</p>
     <?php endif; ?>
 </main>
+  
+<script>
+<?php require __DIR__ . '/../components/listing-card-template.js'; ?>
+</script>
 <script src="/assets/js/listings.js" defer></script>
+<script src="/assets/js/infinite-scroll.js" defer></script>
 </body>
 </html>

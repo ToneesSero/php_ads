@@ -20,6 +20,7 @@ $uploadedImages = $uploadedImages ?? [];
 $uploadLimit = $uploadLimit ?? 5;
 $uploadMaxSize = $uploadMaxSize ?? 5 * 1024 * 1024;
 
+?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -28,7 +29,6 @@ $uploadMaxSize = $uploadMaxSize ?? 5 * 1024 * 1024;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/upload.css">
-
 </head>
 <body>
 <?php require __DIR__ . '/../../components/header.php'; ?>
@@ -78,7 +78,6 @@ $uploadMaxSize = $uploadMaxSize ?? 5 * 1024 * 1024;
             <h2>Фотографии</h2>
             <?php require __DIR__ . '/../components/image-upload.php'; ?>
         </section>
-
         <div class="form-actions">
             <button type="submit" class="button">Обновить</button>
             <a href="/listings/<?= htmlspecialchars((string) $listing['id'], ENT_QUOTES, 'UTF-8'); ?>" class="button button-secondary">Отмена</a>

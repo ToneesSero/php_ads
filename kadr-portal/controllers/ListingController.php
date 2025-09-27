@@ -13,11 +13,9 @@ use function KadrPortal\Helpers\current_user;
 use function KadrPortal\Helpers\db;
 use function KadrPortal\Helpers\flash_old_input;
 use function KadrPortal\Helpers\get_flash;
-
 use function KadrPortal\Helpers\get_listing_upload_limit;
 use function KadrPortal\Helpers\get_listing_upload_max_size;
 use function KadrPortal\Helpers\get_listing_uploads;
-
 use function KadrPortal\Helpers\is_authenticated;
 use function KadrPortal\Helpers\old_input;
 use function KadrPortal\Helpers\reset_csrf_token;
@@ -95,10 +93,18 @@ SELECT
     l.price,
     l.created_at,
     c.name AS category_name,
-    u.name AS author_name
+    u.name AS author_name,
+    img.image_path AS main_image_path
 FROM listings AS l
 LEFT JOIN categories AS c ON c.id = l.category_id
 INNER JOIN users AS u ON u.id = l.user_id
+LEFT JOIN LATERAL (
+    SELECT image_path
+    FROM listing_images
+    WHERE listing_id = l.id
+    ORDER BY is_main DESC, id ASC
+    LIMIT 1
+) AS img ON TRUE
 $whereClause
 ORDER BY l.created_at DESC
 LIMIT :limit OFFSET :offset
@@ -127,6 +133,14 @@ SQL;
             array_pop($listings);
         }
 
+        foreach ($listings as &$listing) {
+            $path = $listing['main_image_path'] ?? null;
+            $thumb = $this->buildThumbPath(is_string($path) ? $path : null);
+
+            $listing['main_image_thumb'] = $thumb ?? (is_string($path) ? $path : null);
+        }
+
+        unset($listing);
         $categories = $this->getCategories();
 
         $currentFilters = [
@@ -177,11 +191,9 @@ SQL;
         $old = old_input();
         $csrfToken = csrf_token();
         $categories = $this->getCategories();
-
         $uploadedImages = get_listing_uploads();
         $uploadLimit = get_listing_upload_limit();
         $uploadMaxSize = get_listing_upload_max_size();
-
 
         header('Content-Type: text/html; charset=utf-8');
         require __DIR__ . '/../templates/listings/create.php';
@@ -273,8 +285,6 @@ SQL;
         $uploadedImages = get_listing_uploads();
         $uploadLimit = get_listing_upload_limit();
         $uploadMaxSize = get_listing_upload_max_size();
-
-
         header('Content-Type: text/html; charset=utf-8');
         require __DIR__ . '/../templates/listings/edit.php';
     }
@@ -549,7 +559,66 @@ SQL;
             return null;
         }
 
+        $images = $this->getListingImages($id);
+        $listing['images'] = $images;
+
+        $listing['main_image_path'] = $images[0]['path'] ?? null;
+        $listing['main_image_thumb'] = $images[0]['thumb'] ?? null;
+
         return $listing;
+    }
+
+    /**
+     * @return array<int, array{path:string,thumb:string,is_main:bool}>
+     */
+    private function getListingImages(int $listingId): array
+    {
+        $stmt = $this->pdo->prepare(
+            'SELECT image_path, COALESCE(is_main, FALSE) AS is_main FROM listing_images WHERE listing_id = :id ORDER BY is_main DESC, id ASC'
+        );
+
+        $stmt->bindValue(':id', $listingId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $images = [];
+
+        while ($row = $stmt->fetch()) {
+            if (!isset($row['image_path']) || !is_string($row['image_path'])) {
+                continue;
+            }
+
+            $path = $row['image_path'];
+
+            $images[] = [
+                'path' => $path,
+                'thumb' => $this->buildThumbPath($path) ?? $path,
+                'is_main' => (bool) ($row['is_main'] ?? false),
+            ];
+        }
+
+        return $images;
+    }
+
+    private function buildThumbPath(?string $path): ?string
+    {
+        if ($path === null || $path === '') {
+            return null;
+        }
+
+        $lastSlash = strrpos($path, '/');
+
+        if ($lastSlash === false) {
+            return null;
+        }
+
+        $directory = substr($path, 0, $lastSlash + 1);
+        $filename = substr($path, $lastSlash + 1);
+
+        if ($filename === '') {
+            return null;
+        }
+
+        return $directory . 'thumb_' . $filename;
     }
 
     private function formatPrice(float $price): string
