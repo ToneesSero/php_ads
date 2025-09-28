@@ -18,8 +18,8 @@ $csrf = csrf_token();
 $isAuthenticated = is_authenticated();
 ?>
 <article class="listing-card">
-    <div class="listing-card-media">
-        <?php if ($thumb !== null) : ?>
+    <?php if ($thumb !== null) : ?>
+        <div class="listing-card-media">
             <a class="listing-card-image" href="/listings/<?= htmlspecialchars((string) $listing['id'], ENT_QUOTES, 'UTF-8'); ?>">
                 <img src="<?= htmlspecialchars($thumb, ENT_QUOTES, 'UTF-8'); ?>"
                      <?php if ($fullImage !== null) : ?>data-full-image="<?= htmlspecialchars($fullImage, ENT_QUOTES, 'UTF-8'); ?>"<?php endif; ?>
@@ -27,12 +27,9 @@ $isAuthenticated = is_authenticated();
                      loading="lazy"
                 >
             </a>
-        <?php else : ?>
-            <a class="listing-card-placeholder" href="/listings/<?= htmlspecialchars((string) $listing['id'], ENT_QUOTES, 'UTF-8'); ?>">
-                <span>Нет фото</span>
-            </a>
-        <?php endif; ?>
-    </div>
+        </div>
+    <?php endif; ?>
+    
     <h2>
         <a href="/listings/<?= htmlspecialchars((string) $listing['id'], ENT_QUOTES, 'UTF-8'); ?>">
             <?= htmlspecialchars($listing['title'], ENT_QUOTES, 'UTF-8'); ?>

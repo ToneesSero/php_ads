@@ -21,7 +21,7 @@
         const form = document.querySelector('[data-comment-form-target]');
         const statusElement = document.querySelector('[data-comment-status]');
 
-        if (!listingId || !listElement || !emptyElement || !loaderElement || !errorElement || !showNewButton || !newCountElement) {
+        if (!listingId || !listElement || !emptyElement || !errorElement || !showNewButton || !newCountElement) {
             console.error('Comments: required elements not found');
             return;
         }
@@ -31,8 +31,20 @@
         let pollTimer = null;
 
         function setLoading(isLoading) {
+            console.log('setLoading called with:', isLoading);
+            
             if (loaderElement) {
-                loaderElement.hidden = !isLoading;
+                if (isLoading) {
+                    loaderElement.removeAttribute('hidden');
+                    loaderElement.style.display = '';
+                } else {
+                    loaderElement.setAttribute('hidden', 'true');
+                    loaderElement.style.display = 'none';
+                }
+                console.log('Loader element hidden attribute:', loaderElement.hasAttribute('hidden'));
+                console.log('Loader element display style:', loaderElement.style.display);
+            } else {
+                console.error('Loader element not found!');
             }
         }
 
@@ -42,18 +54,27 @@
             }
             
             if (!message) {
-                errorElement.hidden = true;
+                errorElement.setAttribute('hidden', 'true');
+                errorElement.style.display = 'none';
                 errorElement.textContent = '';
                 return;
             }
 
-            errorElement.hidden = false;
+            errorElement.removeAttribute('hidden');
+            errorElement.style.display = '';
             errorElement.textContent = message;
         }
 
         function updateEmptyState() {
             const hasComments = listElement.children.length > 0;
-            emptyElement.hidden = hasComments;
+            
+            if (hasComments) {
+                emptyElement.setAttribute('hidden', 'true');
+                emptyElement.style.display = 'none';
+            } else {
+                emptyElement.removeAttribute('hidden');
+                emptyElement.style.display = '';
+            }
         }
 
         function createCommentElement(comment) {
@@ -117,25 +138,6 @@
             updateEmptyState();
         }
 
-        function prependComments(comments) {
-            if (!Array.isArray(comments) || comments.length === 0) {
-                return;
-            }
-
-            comments.forEach(function (comment) {
-                const existing = listElement.querySelector('[data-comment-id="' + comment.id + '"]');
-
-                if (existing) {
-                    return;
-                }
-
-                const element = createCommentElement(comment);
-                listElement.insertBefore(element, listElement.firstChild);
-            });
-
-            updateEmptyState();
-        }
-
         function updateLastId(comments) {
             comments.forEach(function (comment) {
                 if (typeof comment.id === 'number' && comment.id > lastCommentId) {
@@ -184,7 +186,8 @@
                     pendingComments = pendingComments.concat(data.comments);
 
                     newCountElement.textContent = String(pendingComments.length);
-                    showNewButton.hidden = false;
+                    showNewButton.removeAttribute('hidden');
+                    showNewButton.style.display = '';
                 }).catch(function () {
                     // Ошибку фонового обновления тихо игнорируем
                 });
@@ -199,7 +202,8 @@
             appendComments(pendingComments);
             pendingComments = [];
             newCountElement.textContent = '0';
-            showNewButton.hidden = true;
+            showNewButton.setAttribute('hidden', 'true');
+            showNewButton.style.display = 'none';
         }
 
         function handleFormSubmit(event) {
@@ -210,7 +214,6 @@
             }
 
             const formData = new FormData(form);
-
             setError('');
 
             fetch('/api/comments', {
@@ -236,12 +239,10 @@
                 }
 
                 const comment = data.comment;
-
                 updateLastId([comment]);
                 appendComments([comment]);
 
                 const textarea = form.querySelector('textarea[name="comment_text"]');
-
                 if (textarea) {
                     textarea.value = '';
                 }
@@ -273,13 +274,11 @@
             }
 
             const item = target.closest('.comment-item');
-
             if (!item) {
                 return;
             }
 
             const commentId = item.dataset.commentId;
-
             if (!commentId) {
                 return;
             }
@@ -313,30 +312,37 @@
         }
 
         // Инициализация комментариев
+        console.log('Starting comments initialization...');
         setLoading(true);
         setError('');
         
         fetchComments().then(function (data) {
-            try {
-                if (data && Array.isArray(data.comments)) {
-                    appendComments(data.comments);
-                    updateLastId(data.comments);
-                }
-
-                updateEmptyState();
-                startPolling();
-            } catch (error) {
-                console.error('Error processing comments:', error);
-                setError('Ошибка при обработке комментариев');
+            console.log('Comments fetched successfully:', data);
+            
+            if (data && Array.isArray(data.comments)) {
+                appendComments(data.comments);
+                updateLastId(data.comments);
+                console.log('Comments appended, count:', data.comments.length);
             }
+
+            updateEmptyState();
+            startPolling();
+            console.log('Comments initialization completed');
         }).catch(function (error) {
             console.error('Error fetching comments:', error);
             setError(error.message || 'Ошибка загрузки комментариев');
         }).finally(function () {
-            // Принудительно скрываем индикатор загрузки
+            console.log('Finally block: hiding loader');
             setLoading(false);
+            
+            // Дополнительная защита - принудительно скрываем лоадер через небольшую задержку
+            setTimeout(function() {
+                console.log('Timeout: force hiding loader');
+                setLoading(false);
+            }, 100);
         });
 
+        // Привязка событий
         if (form) {
             form.addEventListener('submit', handleFormSubmit);
         }

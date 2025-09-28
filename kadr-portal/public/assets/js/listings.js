@@ -80,14 +80,15 @@ if (gallery) {
         let currentIndex = 0;
 
         const setActive = (index) => {
-            currentIndex = index;
-            track.style.transform = `translateX(-${index * 100}%)`;
+            // Ограничиваем индекс допустимыми значениями
+            currentIndex = Math.max(0, Math.min(index, items.length - 1));
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
 
             items.forEach((item, itemIndex) => {
-                item.classList.toggle('is-active', itemIndex === index);
-                item.setAttribute('aria-hidden', itemIndex === index ? 'false' : 'true');
+                item.classList.toggle('is-active', itemIndex === currentIndex);
+                item.setAttribute('aria-hidden', itemIndex === currentIndex ? 'false' : 'true');
 
-                if (itemIndex === index) {
+                if (itemIndex === currentIndex) {
                     const image = item.querySelector('img');
 
                     if (image instanceof HTMLImageElement && image.dataset.fullImage) {
@@ -99,35 +100,46 @@ if (gallery) {
                 }
             });
 
+            // Обновляем состояние кнопок
             if (prevButton instanceof HTMLButtonElement) {
-                prevButton.disabled = index === 0;
+                prevButton.disabled = currentIndex <= 0;
+                prevButton.style.opacity = currentIndex <= 0 ? '0.5' : '1';
             }
 
             if (nextButton instanceof HTMLButtonElement) {
-                nextButton.disabled = index >= items.length - 1;
+                nextButton.disabled = currentIndex >= items.length - 1;
+                nextButton.style.opacity = currentIndex >= items.length - 1 ? '0.5' : '1';
             }
         };
 
         const showPrev = () => {
+            console.log('showPrev clicked, currentIndex:', currentIndex);
             if (currentIndex > 0) {
                 setActive(currentIndex - 1);
             }
         };
 
         const showNext = () => {
+            console.log('showNext clicked, currentIndex:', currentIndex);
             if (currentIndex < items.length - 1) {
                 setActive(currentIndex + 1);
             }
         };
 
+        // Удаляем старые обработчики и добавляем новые
         if (prevButton instanceof HTMLButtonElement) {
+            prevButton.removeEventListener('click', showPrev);
             prevButton.addEventListener('click', showPrev);
         }
 
         if (nextButton instanceof HTMLButtonElement) {
+            nextButton.removeEventListener('click', showNext);
             nextButton.addEventListener('click', showNext);
         }
 
+        // Инициализируем первый слайд
         setActive(0);
+        
+        console.log('Gallery initialized with', items.length, 'items');
     }
 }

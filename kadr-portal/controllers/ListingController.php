@@ -148,6 +148,9 @@ SQL;
 
             $listing['main_image_thumb'] = $thumb ?? (is_string($path) ? $path : null);
             $listing['is_favorite'] = isset($listing['is_favorite']) ? (bool) $listing['is_favorite'] : false;
+            
+            // ОТЛАДКА: Выводим пути изображений в лог
+            error_log("Listing ID: " . $listing['id'] . ", Original path: " . ($path ?? 'null') . ", Thumb path: " . ($thumb ?? 'null'));
         }
 
         unset($listing);
@@ -255,12 +258,21 @@ SQL;
             $this->pdo->beginTransaction();
             
             $listingId = $this->createListing($user['id'], $data);
-            $this->saveUploadedImages($listingId);
+            
+            // ОТЛАДКА: проверяем что есть в сессии
+            $uploads = get_listing_uploads();
+            error_log("Uploads in session: " . print_r($uploads, true));
+            
+            if (!empty($uploads)) {
+                $this->saveUploadedImages($listingId, $uploads);
+            }
+            
             $this->clearSessionUploads();
             
             $this->pdo->commit();
         } catch (Throwable $exception) {
             $this->pdo->rollBack();
+            error_log("Error creating listing: " . $exception->getMessage());
             $this->rememberFormState($formState, 'listing_create_errors', [
                 'general' => 'Не удалось создать объявление. Попробуйте позже.',
             ]);
@@ -379,7 +391,12 @@ SQL;
             $this->pdo->beginTransaction();
             
             $this->updateListing($listingId, $user['id'], $data);
-            $this->updateListingImages($listingId);
+            
+            $uploads = get_listing_uploads();
+            if (!empty($uploads)) {
+                $this->updateListingImages($listingId, $uploads);
+            }
+            
             $this->clearSessionUploads();
             
             $this->pdo->commit();
@@ -433,27 +450,27 @@ SQL;
         header('Location: /listings', true, 303);
     }
 
-    private function saveUploadedImages(int $listingId): void
+    private function saveUploadedImages(int $listingId, array $uploads): void
     {
-        $uploads = get_listing_uploads();
+        error_log("Saving " . count($uploads) . " images for listing " . $listingId);
         
-        if (empty($uploads)) {
-            return;
-        }
-
         foreach ($uploads as $index => $upload) {
+            error_log("Saving image: " . print_r($upload, true));
+            
             $stmt = $this->pdo->prepare(
                 'INSERT INTO listing_images (listing_id, image_path, is_main) VALUES (:listing_id, :path, :is_main)'
             );
             
             $stmt->bindValue(':listing_id', $listingId, PDO::PARAM_INT);
             $stmt->bindValue(':path', $upload['path']);
-            $stmt->bindValue(':is_main', $index === 0, PDO::PARAM_BOOL); // Первое изображение как основное
+            $stmt->bindValue(':is_main', $index === 0, PDO::PARAM_BOOL);
             $stmt->execute();
+            
+            error_log("Saved image with path: " . $upload['path']);
         }
     }
 
-    private function updateListingImages(int $listingId): void
+    private function updateListingImages(int $listingId, array $uploads): void
     {
         // Удаляем старые изображения
         $stmt = $this->pdo->prepare('DELETE FROM listing_images WHERE listing_id = :listing_id');
@@ -461,7 +478,7 @@ SQL;
         $stmt->execute();
         
         // Сохраняем новые
-        $this->saveUploadedImages($listingId);
+        $this->saveUploadedImages($listingId, $uploads);
     }
 
     private function loadExistingImagesIntoSession(int $listingId): void
