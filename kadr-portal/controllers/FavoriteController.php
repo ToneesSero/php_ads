@@ -63,11 +63,6 @@ class FavoriteController
             return;
         }
 
-        if (!$this->listingExists($listingId)) {
-            $this->json(['error' => 'Объявление не найдено.'], 404);
-            return;
-        }
-
         $action = is_string($_POST['action'] ?? null) ? strtolower((string) $_POST['action']) : 'toggle';
         $existingId = $this->getFavoriteId((int) $user['id'], $listingId);
 
@@ -102,6 +97,10 @@ class FavoriteController
             return;
         }
 
+        if (!$this->listingExists($listingId)) {
+            $this->json(['error' => 'Объявление не найдено.'], 404);
+            return;
+        }
         if ($action === 'add' || $action === 'toggle') {
             $stmt = $this->pdo->prepare(
                 'INSERT INTO favorites (user_id, listing_id) VALUES (:user_id, :listing_id)'
@@ -140,7 +139,7 @@ class FavoriteController
             . '    ORDER BY is_main DESC, id ASC'
             . '    LIMIT 1'
             . ') AS img ON TRUE '
-            . 'WHERE f.user_id = :user_id '
+            . "WHERE f.user_id = :user_id AND l.status = 'active' "
             . 'ORDER BY f.created_at DESC'
         );
         $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
@@ -182,7 +181,7 @@ class FavoriteController
 
     private function listingExists(int $listingId): bool
     {
-        $stmt = $this->pdo->prepare('SELECT 1 FROM listings WHERE id = :id');
+        $stmt = $this->pdo->prepare("SELECT 1 FROM listings WHERE id = :id AND status = 'active'");
         $stmt->bindValue(':id', $listingId, PDO::PARAM_INT);
         $stmt->execute();
 

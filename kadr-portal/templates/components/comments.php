@@ -8,7 +8,7 @@ declare(strict_types=1);
 <section class="comments" data-comments data-listing-id="<?= htmlspecialchars((string) $listingId, ENT_QUOTES, 'UTF-8'); ?>" data-csrf-token="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="comments__header">
         <h2 class="comments__title">Комментарии</h2>
-        <button type="button" class="comments__notify" data-comments-show-new hidden style="display: none;">
+        <button type="button" class="comments__notify" data-comments-show-new hidden>
             Показать новые (<span data-comments-new-count>0</span>)
         </button>
     </div>

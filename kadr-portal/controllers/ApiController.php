@@ -8,7 +8,6 @@ use PDO;
 use RuntimeException;
 use Throwable;
 
-
 use function KadrPortal\Helpers\current_user;
 use function KadrPortal\Helpers\db;
 
@@ -79,6 +78,7 @@ SQL;
             if ($userId !== null) {
                 $stmt->bindValue(':favorite_user_id', $userId, PDO::PARAM_INT);
             }
+
             $stmt->bindValue(':limit', $limit + 1, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();
@@ -144,7 +144,7 @@ SQL;
      */
     private function buildFilters(array $query): array
     {
-        $filters = [];
+        $filters = ["l.status = 'active'"];
         $bindings = [];
 
         $search = isset($query['search']) ? trim((string) $query['search']) : '';

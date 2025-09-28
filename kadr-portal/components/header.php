@@ -14,11 +14,13 @@ $unreadMessages = is_authenticated() ? unread_messages_count() : 0;
 <header class="site-header">
     <div class="container header-inner">
         <a class="logo" href="/listings">ПоРукам</a>
+
         <nav class="main-nav">
             <ul>
                 <li class="nav-item"><a href="/listings">Объявления</a></li>
                 <?php if (is_authenticated() && $user !== null) : ?>
                     <li class="nav-item"><a href="/listings/create">Добавить объявление</a></li>
+                    <li class="nav-item"><a href="/profile/listings">Мои объявления</a></li>
                     <li class="nav-item"><a href="/favorites">Избранное</a></li>
                     <li class="nav-item"><a href="/messages">Сообщения<?php if ($unreadMessages > 0) : ?><span class="nav-badge" aria-label="Непрочитанные сообщения"><?= (int) $unreadMessages; ?></span><?php endif; ?></a></li>
                     <li class="nav-item">Здравствуйте, <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8'); ?></li>

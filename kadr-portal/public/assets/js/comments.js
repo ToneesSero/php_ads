@@ -21,7 +21,8 @@
         const form = document.querySelector('[data-comment-form-target]');
         const statusElement = document.querySelector('[data-comment-status]');
 
-        if (!listingId || !listElement || !emptyElement || !errorElement || !showNewButton || !newCountElement) {
+
+        if (!listingId || !listElement || !emptyElement || !loaderElement || !errorElement || !showNewButton || !newCountElement) {
             console.error('Comments: required elements not found');
             return;
         }
@@ -31,43 +32,24 @@
         let pollTimer = null;
 
         function setLoading(isLoading) {
-            console.log('setLoading called with:', isLoading);
-            
-            if (loaderElement) {
-                if (isLoading) {
-                    loaderElement.removeAttribute('hidden');
-                    loaderElement.style.display = '';
-                } else {
-                    loaderElement.setAttribute('hidden', 'true');
-                    loaderElement.style.display = 'none';
-                }
-                console.log('Loader element hidden attribute:', loaderElement.hasAttribute('hidden'));
-                console.log('Loader element display style:', loaderElement.style.display);
-            } else {
-                console.error('Loader element not found!');
-            }
+            loaderElement.hidden = !isLoading;
         }
 
         function setError(message) {
-            if (!errorElement) {
-                return;
-            }
-            
             if (!message) {
-                errorElement.setAttribute('hidden', 'true');
-                errorElement.style.display = 'none';
+                errorElement.hidden = true;
                 errorElement.textContent = '';
                 return;
             }
 
+            errorElement.hidden = false;
             errorElement.removeAttribute('hidden');
             errorElement.style.display = '';
             errorElement.textContent = message;
         }
 
         function updateEmptyState() {
-            const hasComments = listElement.children.length > 0;
-            
+            const hasComments = listElement.children.length > 0;            
             if (hasComments) {
                 emptyElement.setAttribute('hidden', 'true');
                 emptyElement.style.display = 'none';
@@ -138,6 +120,25 @@
             updateEmptyState();
         }
 
+        function prependComments(comments) {
+            if (!Array.isArray(comments) || comments.length === 0) {
+                return;
+            }
+
+            comments.forEach(function (comment) {
+                const existing = listElement.querySelector('[data-comment-id="' + comment.id + '"]');
+
+                if (existing) {
+                    return;
+                }
+
+                const element = createCommentElement(comment);
+                listElement.insertBefore(element, listElement.firstChild);
+            });
+
+            updateEmptyState();
+        }
+
         function updateLastId(comments) {
             comments.forEach(function (comment) {
                 if (typeof comment.id === 'number' && comment.id > lastCommentId) {
@@ -186,8 +187,11 @@
                     pendingComments = pendingComments.concat(data.comments);
 
                     newCountElement.textContent = String(pendingComments.length);
+
+                    showNewButton.hidden = false;
                     showNewButton.removeAttribute('hidden');
                     showNewButton.style.display = '';
+
                 }).catch(function () {
                     // Ошибку фонового обновления тихо игнорируем
                 });
@@ -202,6 +206,7 @@
             appendComments(pendingComments);
             pendingComments = [];
             newCountElement.textContent = '0';
+            showNewButton.hidden = true;
             showNewButton.setAttribute('hidden', 'true');
             showNewButton.style.display = 'none';
         }
@@ -243,6 +248,7 @@
                 appendComments([comment]);
 
                 const textarea = form.querySelector('textarea[name="comment_text"]');
+
                 if (textarea) {
                     textarea.value = '';
                 }
@@ -279,6 +285,7 @@
             }
 
             const commentId = item.dataset.commentId;
+
             if (!commentId) {
                 return;
             }
@@ -311,38 +318,25 @@
             });
         }
 
-        // Инициализация комментариев
-        console.log('Starting comments initialization...');
         setLoading(true);
         setError('');
-        
         fetchComments().then(function (data) {
-            console.log('Comments fetched successfully:', data);
-            
             if (data && Array.isArray(data.comments)) {
                 appendComments(data.comments);
                 updateLastId(data.comments);
-                console.log('Comments appended, count:', data.comments.length);
             }
 
             updateEmptyState();
             startPolling();
-            console.log('Comments initialization completed');
         }).catch(function (error) {
-            console.error('Error fetching comments:', error);
-            setError(error.message || 'Ошибка загрузки комментариев');
+            setError(error.message);
         }).finally(function () {
-            console.log('Finally block: hiding loader');
-            setLoading(false);
-            
-            // Дополнительная защита - принудительно скрываем лоадер через небольшую задержку
-            setTimeout(function() {
+setTimeout(function() {
                 console.log('Timeout: force hiding loader');
                 setLoading(false);
             }, 100);
         });
 
-        // Привязка событий
         if (form) {
             form.addEventListener('submit', handleFormSubmit);
         }
@@ -362,3 +356,4 @@
 
     document.addEventListener('DOMContentLoaded', initComments);
 }());
+

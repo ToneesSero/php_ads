@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 
-
 // Настройка сессии
 $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
 session_set_cookie_params([
@@ -27,6 +26,7 @@ require_once __DIR__ . '/../helpers/image.php';
 require_once __DIR__ . '/../helpers/upload.php';
 require_once __DIR__ . '/../helpers/database.php';
 require_once __DIR__ . '/../helpers/messages.php';
+require_once __DIR__ . '/../helpers/statistics.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/ListingController.php';
 require_once __DIR__ . '/../controllers/UploadController.php';
@@ -34,6 +34,7 @@ require_once __DIR__ . '/../controllers/ApiController.php';
 require_once __DIR__ . '/../controllers/CommentController.php';
 require_once __DIR__ . '/../controllers/FavoriteController.php';
 require_once __DIR__ . '/../controllers/MessageController.php';
+require_once __DIR__ . '/../controllers/ProfileController.php';
 
 use KadrPortal\Controllers\AuthController;
 use KadrPortal\Controllers\ListingController;
@@ -42,6 +43,7 @@ use KadrPortal\Controllers\ApiController;
 use KadrPortal\Controllers\CommentController;
 use KadrPortal\Controllers\FavoriteController;
 use KadrPortal\Controllers\MessageController;
+use KadrPortal\Controllers\ProfileController;
 use KadrPortal\Helpers\Router;
 
 $router = new Router();
@@ -52,6 +54,7 @@ $apiController = new ApiController();
 $commentController = new CommentController();
 $favoriteController = new FavoriteController();
 $messageController = new MessageController();
+$profileController = new ProfileController();
 
 
 $router->get('/', static function (): void {
@@ -84,6 +87,14 @@ $router->post('/api/favorites', [$favoriteController, 'toggle']);
 $router->get('/messages', [$messageController, 'index']);
 $router->get('/messages/{id}', [$messageController, 'conversation']);
 $router->post('/api/messages', [$messageController, 'store']);
+
+$router->get('/profile/listings', [$profileController, 'listings']);
+$router->patch('/api/listings/{id}/status', [$profileController, 'updateStatus']);
+$router->patch('/api/listings/{id}', [$profileController, 'quickUpdate']);
+$router->delete('/api/listings/{id}', [$profileController, 'delete']);
+$router->post('/api/listings/{id}/duplicate', [$profileController, 'duplicate']);
+$router->post('/api/listings/bulk-action', [$profileController, 'bulkAction']);
+$router->get('/api/listings/{id}/stats', [$profileController, 'stats']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
 

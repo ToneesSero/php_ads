@@ -20,6 +20,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./kadr-portal:/var/www/html
+      - ./kadr-portal/public/uploads:/var/www/html/public/uploads
     environment:
       APP_ENV: ${APP_ENV:-local}
       DB_HOST: db
@@ -44,3 +45,4 @@ services:
 
 volumes:
   db_data:
+

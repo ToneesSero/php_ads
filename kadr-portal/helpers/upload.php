@@ -195,20 +195,7 @@ function store_listing_upload(array $file): array
 
 function listing_upload_directory(): string
 {
-    // Определяем корневую директорию проекта более надежно
-    $projectRoot = $_SERVER['DOCUMENT_ROOT'] ?? dirname(__DIR__) . '/public';
-    
-    // Убираем '/public' если он есть в пути
-    if (str_ends_with($projectRoot, '/public')) {
-        $projectRoot = dirname($projectRoot);
-    }
-    
-    $uploadDir = $projectRoot . '/public/uploads/listings';
-    
-    // Логируем для отладки
-    error_log("Upload directory determined as: " . $uploadDir);
-    
-    return $uploadDir;
+    return dirname(__DIR__) . '/public/uploads/listings';
 }
 
 function upload_error_message(int $errorCode): string
@@ -223,3 +210,4 @@ function upload_error_message(int $errorCode): string
         default => 'Произошла ошибка при загрузке файла.',
     };
 }
+

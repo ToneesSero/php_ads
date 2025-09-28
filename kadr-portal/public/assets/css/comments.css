@@ -40,7 +40,6 @@
 .comments__notify[hidden] {
     display: none !important;
 }
-
 .comments__body {
     position: relative;
 }
@@ -111,7 +110,6 @@
 .comments__empty[hidden] {
     display: none !important;
 }
-
 .comments__error {
     margin: 1rem 0 0;
     color: #c62828;
@@ -121,7 +119,6 @@
 .comments__error[hidden] {
     display: none !important;
 }
-
 .comments__loader {
     display: flex;
     align-items: center;
@@ -205,3 +202,4 @@
         padding: 1rem;
     }
 }
+

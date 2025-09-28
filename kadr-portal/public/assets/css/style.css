@@ -193,6 +193,28 @@ h3 {
     flex-direction: column;
     gap: 0.75rem;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.listing-card-media {
+    position: relative;
+    width: 100%;
+    padding-top: 66.6667%;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+
+.listing-card-image,
+.listing-card-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: #374151;
+    font-weight: 500;
+    background-color: #f9fafb;
     overflow: hidden;
 }
 
@@ -218,6 +240,16 @@ h3 {
 
 .listing-card-image img {
     width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.listing-card-placeholder span {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid #d1d5db;
+    font-size: 0.85rem;
     height: auto;
     max-height: 450px;
     object-fit: cover;
@@ -380,7 +412,6 @@ h3 {
         height: 2rem;
         font-size: 1.25rem;
     }
-    
     .listing-card-image img {
         max-height: 300px;
     }
@@ -647,3 +678,4 @@ h3 {
     margin: 2rem 0;
     color: #6b7280;
 }
+

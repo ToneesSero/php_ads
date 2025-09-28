@@ -38,7 +38,7 @@ class ListingController
         $perPage = 10;
         $offset = ($page - 1) * $perPage;
 
-        $filters = [];
+        $filters = ["l.status = 'active'"];
         $params = [];
 
         $user = current_user();
@@ -90,6 +90,7 @@ class ListingController
         $favoriteJoin = $userId !== null
             ? 'LEFT JOIN favorites AS f ON f.listing_id = l.id AND f.user_id = :favorite_user_id'
             : '';
+
         $sql = <<<SQL
 SELECT
     l.id,
@@ -127,6 +128,7 @@ SQL;
 
             $stmt->bindValue($key, $value);
         }
+
         if ($userId !== null) {
             $stmt->bindValue(':favorite_user_id', $userId, PDO::PARAM_INT);
         }
@@ -148,9 +150,6 @@ SQL;
 
             $listing['main_image_thumb'] = $thumb ?? (is_string($path) ? $path : null);
             $listing['is_favorite'] = isset($listing['is_favorite']) ? (bool) $listing['is_favorite'] : false;
-            
-            // ОТЛАДКА: Выводим пути изображений в лог
-            error_log("Listing ID: " . $listing['id'] . ", Original path: " . ($path ?? 'null') . ", Thumb path: " . ($thumb ?? 'null'));
         }
 
         unset($listing);
@@ -189,12 +188,27 @@ SQL;
         }
 
         $user = current_user();
+        $isOwner = $user !== null && (int) $listing['user_id'] === (int) $user['id'];
+
+        if (($listing['status'] ?? 'active') !== 'active' && !$isOwner) {
+            http_response_code(404);
+            echo 'Объявление недоступно.';
+            return;
+        }
 
         if ($user !== null) {
             $listing['is_favorite'] = $this->isListingFavorited($listingId, (int) $user['id']);
         } else {
             $listing['is_favorite'] = false;
         }
+
+        $views = $this->incrementListingViews($listingId);
+
+        if ($views !== null) {
+            $listing['views_count'] = $views['views_count'];
+            $listing['last_viewed_at'] = $views['last_viewed_at'];
+        }
+
         $csrfToken = csrf_token();
 
         header('Content-Type: text/html; charset=utf-8');
@@ -255,24 +269,9 @@ SQL;
         }
 
         try {
-            $this->pdo->beginTransaction();
-            
             $listingId = $this->createListing($user['id'], $data);
-            
-            // ОТЛАДКА: проверяем что есть в сессии
-            $uploads = get_listing_uploads();
-            error_log("Uploads in session: " . print_r($uploads, true));
-            
-            if (!empty($uploads)) {
-                $this->saveUploadedImages($listingId, $uploads);
-            }
-            
-            $this->clearSessionUploads();
-            
-            $this->pdo->commit();
         } catch (Throwable $exception) {
-            $this->pdo->rollBack();
-            error_log("Error creating listing: " . $exception->getMessage());
+
             $this->rememberFormState($formState, 'listing_create_errors', [
                 'general' => 'Не удалось создать объявление. Попробуйте позже.',
             ]);
@@ -318,14 +317,10 @@ SQL;
         $old = old_input();
         $categories = $this->getCategories();
         $csrfToken = csrf_token();
-        
-        // Загружаем существующие изображения в сессию для редактора
-        $this->loadExistingImagesIntoSession($listingId);
-        
         $uploadedImages = get_listing_uploads();
         $uploadLimit = get_listing_upload_limit();
         $uploadMaxSize = get_listing_upload_max_size();
-        
+
         header('Content-Type: text/html; charset=utf-8');
         require __DIR__ . '/../templates/listings/edit.php';
     }
@@ -388,20 +383,8 @@ SQL;
         }
 
         try {
-            $this->pdo->beginTransaction();
-            
             $this->updateListing($listingId, $user['id'], $data);
-            
-            $uploads = get_listing_uploads();
-            if (!empty($uploads)) {
-                $this->updateListingImages($listingId, $uploads);
-            }
-            
-            $this->clearSessionUploads();
-            
-            $this->pdo->commit();
         } catch (Throwable $exception) {
-            $this->pdo->rollBack();
             $this->rememberFormState($formState, 'listing_edit_errors', [
                 'general' => 'Не удалось обновить объявление. Попробуйте позже.',
             ]);
@@ -448,62 +431,6 @@ SQL;
 
         reset_csrf_token();
         header('Location: /listings', true, 303);
-    }
-
-    private function saveUploadedImages(int $listingId, array $uploads): void
-    {
-        error_log("Saving " . count($uploads) . " images for listing " . $listingId);
-        
-        foreach ($uploads as $index => $upload) {
-            error_log("Saving image: " . print_r($upload, true));
-            
-            $stmt = $this->pdo->prepare(
-                'INSERT INTO listing_images (listing_id, image_path, is_main) VALUES (:listing_id, :path, :is_main)'
-            );
-            
-            $stmt->bindValue(':listing_id', $listingId, PDO::PARAM_INT);
-            $stmt->bindValue(':path', $upload['path']);
-            $stmt->bindValue(':is_main', $index === 0, PDO::PARAM_BOOL);
-            $stmt->execute();
-            
-            error_log("Saved image with path: " . $upload['path']);
-        }
-    }
-
-    private function updateListingImages(int $listingId, array $uploads): void
-    {
-        // Удаляем старые изображения
-        $stmt = $this->pdo->prepare('DELETE FROM listing_images WHERE listing_id = :listing_id');
-        $stmt->bindValue(':listing_id', $listingId, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        // Сохраняем новые
-        $this->saveUploadedImages($listingId, $uploads);
-    }
-
-    private function loadExistingImagesIntoSession(int $listingId): void
-    {
-        $images = $this->getListingImages($listingId);
-        
-        // Очищаем текущую сессию
-        $this->clearSessionUploads();
-        
-        // Загружаем существующие изображения в сессию
-        foreach ($images as $image) {
-            $upload = [
-                'id' => basename($image['path']),
-                'path' => $image['path'],
-                'thumb' => $image['thumb']
-            ];
-            
-            \KadrPortal\Helpers\remember_listing_upload($upload);
-        }
-    }
-
-    private function clearSessionUploads(): void
-    {
-        \KadrPortal\Helpers\ensureSession();
-        unset($_SESSION['listing_uploads']);
     }
 
     private function ensureAuthenticated(): bool
@@ -656,7 +583,12 @@ SQL;
     private function findListing(int $id): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT l.id, l.title, l.description, l.price, l.created_at, l.updated_at, l.user_id, c.name AS category_name, c.id AS category_id, u.name AS author_name FROM listings AS l LEFT JOIN categories AS c ON c.id = l.category_id INNER JOIN users AS u ON u.id = l.user_id WHERE l.id = :id LIMIT 1'
+            'SELECT l.id, l.title, l.description, l.price, l.created_at, l.updated_at, l.user_id, l.status, l.views_count, l.last_viewed_at, '
+            . 'c.name AS category_name, c.id AS category_id, u.name AS author_name '
+            . 'FROM listings AS l '
+            . 'LEFT JOIN categories AS c ON c.id = l.category_id '
+            . 'INNER JOIN users AS u ON u.id = l.user_id '
+            . 'WHERE l.id = :id LIMIT 1'
         );
 
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -673,6 +605,9 @@ SQL;
 
         $listing['main_image_path'] = $images[0]['path'] ?? null;
         $listing['main_image_thumb'] = $images[0]['thumb'] ?? null;
+        $listing['status'] = (string) ($listing['status'] ?? 'active');
+        $listing['views_count'] = (int) ($listing['views_count'] ?? 0);
+        $listing['last_viewed_at'] = $listing['last_viewed_at'] ?? null;
 
         return $listing;
     }
@@ -706,6 +641,30 @@ SQL;
         }
 
         return $images;
+    }
+
+    /**
+     * @return array{views_count:int,last_viewed_at:?string}|null
+     */
+    private function incrementListingViews(int $listingId): ?array
+    {
+        $stmt = $this->pdo->prepare(
+            'UPDATE listings SET views_count = views_count + 1, last_viewed_at = NOW() WHERE id = :id RETURNING views_count, last_viewed_at'
+        );
+
+        $stmt->bindValue(':id', $listingId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $row = $stmt->fetch();
+
+        if ($row === false) {
+            return null;
+        }
+
+        return [
+            'views_count' => (int) ($row['views_count'] ?? 0),
+            'last_viewed_at' => isset($row['last_viewed_at']) ? (string) $row['last_viewed_at'] : null,
+        ];
     }
     private function isListingFavorited(int $listingId, int $userId): bool
     {
@@ -748,3 +707,4 @@ SQL;
         return verify_csrf_token($token);
     }
 }
+

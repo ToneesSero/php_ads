@@ -58,6 +58,7 @@ if (listingsPage) {
     };
 }
 
+
 // Инициализация галереи изображений
 const gallery = document.querySelector('[data-gallery]');
 
@@ -66,8 +67,6 @@ if (gallery) {
     const items = track ? Array.from(track.querySelectorAll('[data-gallery-item]')) : [];
     const prevButton = gallery.querySelector('[data-gallery-prev]');
     const nextButton = gallery.querySelector('[data-gallery-next]');
-
-    console.log('Gallery found with', items.length, 'items');
 
     // Если изображений 1 или меньше - скрываем обе кнопки
     if (items.length <= 1) {
@@ -130,14 +129,12 @@ if (gallery) {
         };
 
         const showPrev = () => {
-            console.log('showPrev clicked, currentIndex:', currentIndex);
             if (currentIndex > 0) {
                 setActive(currentIndex - 1);
             }
         };
 
         const showNext = () => {
-            console.log('showNext clicked, currentIndex:', currentIndex);
             if (currentIndex < items.length - 1) {
                 setActive(currentIndex + 1);
             }
@@ -151,11 +148,8 @@ if (gallery) {
 
         if (nextButton instanceof HTMLButtonElement) {
             nextButton.addEventListener('click', showNext);
-            console.log('Next button event listener added');
         }
-
         // Инициализируем первый слайд
-        setActive(0);
-        console.log('Gallery initialized with index 0');
+        setActive(0);        
     }
 }

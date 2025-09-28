@@ -76,7 +76,3 @@ INSERT INTO categories (name, slug) VALUES
     ('Услуги', 'services')
 ON CONFLICT (slug) DO NOTHING;
 
--- Тестовый пользователь (пароль: 12345678)
-INSERT INTO users (email, password_hash, name) VALUES 
-    ('test@example.com', '$argon2id$v=19$m=65536,t=4,p=3$M2dJTGdyVUZBZ3BoT3VsaQ$n7+OKCmCLz7m4vz8i5cJgmKJ0OKMkV9S3rA5O4A8Wxw', 'Тестовый пользователь')
-ON CONFLICT (email) DO NOTHING;

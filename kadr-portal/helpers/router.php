@@ -27,6 +27,22 @@ class Router
         ];
     }
 
+    public function patch(string $path, callable $handler): void
+    {
+        $this->routes['PATCH'][] = [
+            'pattern' => $path,
+            'handler' => $handler,
+        ];
+    }
+
+    public function delete(string $path, callable $handler): void
+    {
+        $this->routes['DELETE'][] = [
+            'pattern' => $path,
+            'handler' => $handler,
+        ];
+    }
+
     public function dispatch(string $method, string $uri): void
     {
         $path = parse_url($uri, PHP_URL_PATH) ?? '/';

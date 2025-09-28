@@ -20,4 +20,3 @@ db-shell:
 
 .PHONY: up down migrate logs shell db-shell
 
-
