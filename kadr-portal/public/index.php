@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+
+// Настройка сессии
 $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
 session_set_cookie_params([
     'lifetime' => 0,
@@ -14,6 +16,8 @@ session_set_cookie_params([
 
 session_start();
 
+
+// Подключение всех необходимых файлов
 require_once __DIR__ . '/../helpers/router.php';
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../helpers/csrf.php';
@@ -52,11 +56,12 @@ $favoriteController = new FavoriteController();
 $messageController = new MessageController();
 $profileController = new ProfileController();
 
+
 $router->get('/', static function (): void {
-    header('Content-Type: text/plain; charset=utf-8');
-    echo 'Welcome to Kadr Portal';
+    header('Location: /listings', true, 303);    
 });
 
+// Маршруты авторизации
 $router->get('/login', [$authController, 'showLogin']);
 $router->post('/login', [$authController, 'login']);
 $router->get('/register', [$authController, 'showRegister']);
@@ -70,6 +75,7 @@ $router->get('/listings/{id}', [$listingController, 'show']);
 $router->get('/listings/{id}/edit', [$listingController, 'edit']);
 $router->post('/listings/{id}/update', [$listingController, 'update']);
 $router->post('/listings/{id}/delete', [$listingController, 'destroy']);
+
 $router->get('/api/listings', [$apiController, 'listings']);
 $router->post('/api/upload', [$uploadController, 'store']);
 $router->post('/api/upload/delete', [$uploadController, 'destroy']);
@@ -81,6 +87,7 @@ $router->post('/api/favorites', [$favoriteController, 'toggle']);
 $router->get('/messages', [$messageController, 'index']);
 $router->get('/messages/{id}', [$messageController, 'conversation']);
 $router->post('/api/messages', [$messageController, 'store']);
+
 $router->get('/profile/listings', [$profileController, 'listings']);
 $router->patch('/api/listings/{id}/status', [$profileController, 'updateStatus']);
 $router->patch('/api/listings/{id}', [$profileController, 'quickUpdate']);
@@ -90,3 +97,4 @@ $router->post('/api/listings/bulk-action', [$profileController, 'bulkAction']);
 $router->get('/api/listings/{id}/stats', [$profileController, 'stats']);
 
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
+

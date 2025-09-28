@@ -210,3 +210,4 @@ function upload_error_message(int $errorCode): string
         default => 'Произошла ошибка при загрузке файла.',
     };
 }
+

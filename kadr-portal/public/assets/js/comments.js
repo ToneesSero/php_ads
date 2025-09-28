@@ -21,7 +21,9 @@
         const form = document.querySelector('[data-comment-form-target]');
         const statusElement = document.querySelector('[data-comment-status]');
 
+
         if (!listingId || !listElement || !emptyElement || !loaderElement || !errorElement || !showNewButton || !newCountElement) {
+            console.error('Comments: required elements not found');
             return;
         }
 
@@ -41,12 +43,20 @@
             }
 
             errorElement.hidden = false;
+            errorElement.removeAttribute('hidden');
+            errorElement.style.display = '';
             errorElement.textContent = message;
         }
 
         function updateEmptyState() {
-            const hasComments = listElement.children.length > 0;
-            emptyElement.hidden = hasComments;
+            const hasComments = listElement.children.length > 0;            
+            if (hasComments) {
+                emptyElement.setAttribute('hidden', 'true');
+                emptyElement.style.display = 'none';
+            } else {
+                emptyElement.removeAttribute('hidden');
+                emptyElement.style.display = '';
+            }
         }
 
         function createCommentElement(comment) {
@@ -177,7 +187,11 @@
                     pendingComments = pendingComments.concat(data.comments);
 
                     newCountElement.textContent = String(pendingComments.length);
+
                     showNewButton.hidden = false;
+                    showNewButton.removeAttribute('hidden');
+                    showNewButton.style.display = '';
+
                 }).catch(function () {
                     // Ошибку фонового обновления тихо игнорируем
                 });
@@ -193,6 +207,8 @@
             pendingComments = [];
             newCountElement.textContent = '0';
             showNewButton.hidden = true;
+            showNewButton.setAttribute('hidden', 'true');
+            showNewButton.style.display = 'none';
         }
 
         function handleFormSubmit(event) {
@@ -203,7 +219,6 @@
             }
 
             const formData = new FormData(form);
-
             setError('');
 
             fetch('/api/comments', {
@@ -229,7 +244,6 @@
                 }
 
                 const comment = data.comment;
-
                 updateLastId([comment]);
                 appendComments([comment]);
 
@@ -266,7 +280,6 @@
             }
 
             const item = target.closest('.comment-item');
-
             if (!item) {
                 return;
             }
@@ -318,7 +331,10 @@
         }).catch(function (error) {
             setError(error.message);
         }).finally(function () {
-            setLoading(false);
+setTimeout(function() {
+                console.log('Timeout: force hiding loader');
+                setLoading(false);
+            }, 100);
         });
 
         if (form) {
@@ -340,3 +356,4 @@
 
     document.addEventListener('DOMContentLoaded', initComments);
 }());
+

@@ -43,7 +43,6 @@ class ListingController
 
         $user = current_user();
         $userId = $user !== null ? (int) $user['id'] : null;
-
         $search = trim($_GET['search'] ?? '');
 
         if ($search !== '') {
@@ -87,7 +86,6 @@ class ListingController
         }
 
         $whereClause = $filters !== [] ? 'WHERE ' . implode(' AND ', $filters) : '';
-
         $favoriteSelect = $userId !== null ? ', (f.id IS NOT NULL) AS is_favorite' : ', FALSE AS is_favorite';
         $favoriteJoin = $userId !== null
             ? 'LEFT JOIN favorites AS f ON f.listing_id = l.id AND f.user_id = :favorite_user_id'
@@ -134,7 +132,6 @@ SQL;
         if ($userId !== null) {
             $stmt->bindValue(':favorite_user_id', $userId, PDO::PARAM_INT);
         }
-
         $stmt->bindValue(':limit', $perPage + 1, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -156,7 +153,6 @@ SQL;
         }
 
         unset($listing);
-
         $categories = $this->getCategories();
 
         $currentFilters = [
@@ -275,6 +271,7 @@ SQL;
         try {
             $listingId = $this->createListing($user['id'], $data);
         } catch (Throwable $exception) {
+
             $this->rememberFormState($formState, 'listing_create_errors', [
                 'general' => 'Не удалось создать объявление. Попробуйте позже.',
             ]);
@@ -669,7 +666,6 @@ SQL;
             'last_viewed_at' => isset($row['last_viewed_at']) ? (string) $row['last_viewed_at'] : null,
         ];
     }
-
     private function isListingFavorited(int $listingId, int $userId): bool
     {
         $stmt = $this->pdo->prepare('SELECT 1 FROM favorites WHERE listing_id = :listing_id AND user_id = :user_id');
@@ -679,7 +675,6 @@ SQL;
 
         return $stmt->fetchColumn() !== false;
     }
-
     private function buildThumbPath(?string $path): ?string
     {
         if ($path === null || $path === '') {
@@ -712,3 +707,4 @@ SQL;
         return verify_csrf_token($token);
     }
 }
+

@@ -101,7 +101,6 @@ class FavoriteController
             $this->json(['error' => 'Объявление не найдено.'], 404);
             return;
         }
-
         if ($action === 'add' || $action === 'toggle') {
             $stmt = $this->pdo->prepare(
                 'INSERT INTO favorites (user_id, listing_id) VALUES (:user_id, :listing_id)'
