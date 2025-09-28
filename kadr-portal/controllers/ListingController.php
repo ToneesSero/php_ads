@@ -43,7 +43,6 @@ class ListingController
 
         $user = current_user();
         $userId = $user !== null ? (int) $user['id'] : null;
-
         $search = trim($_GET['search'] ?? '');
 
         if ($search !== '') {
@@ -87,12 +86,10 @@ class ListingController
         }
 
         $whereClause = $filters !== [] ? 'WHERE ' . implode(' AND ', $filters) : '';
-
         $favoriteSelect = $userId !== null ? ', (f.id IS NOT NULL) AS is_favorite' : ', FALSE AS is_favorite';
         $favoriteJoin = $userId !== null
             ? 'LEFT JOIN favorites AS f ON f.listing_id = l.id AND f.user_id = :favorite_user_id'
             : '';
-
         $sql = <<<SQL
 SELECT
     l.id,
@@ -130,11 +127,9 @@ SQL;
 
             $stmt->bindValue($key, $value);
         }
-
         if ($userId !== null) {
             $stmt->bindValue(':favorite_user_id', $userId, PDO::PARAM_INT);
         }
-
         $stmt->bindValue(':limit', $perPage + 1, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -156,7 +151,6 @@ SQL;
         }
 
         unset($listing);
-
         $categories = $this->getCategories();
 
         $currentFilters = [
@@ -198,7 +192,6 @@ SQL;
         } else {
             $listing['is_favorite'] = false;
         }
-
         $csrfToken = csrf_token();
 
         header('Content-Type: text/html; charset=utf-8');
@@ -309,7 +302,6 @@ SQL;
         $uploadedImages = get_listing_uploads();
         $uploadLimit = get_listing_upload_limit();
         $uploadMaxSize = get_listing_upload_max_size();
-
         header('Content-Type: text/html; charset=utf-8');
         require __DIR__ . '/../templates/listings/edit.php';
     }
@@ -623,7 +615,6 @@ SQL;
 
         return $images;
     }
-
     private function isListingFavorited(int $listingId, int $userId): bool
     {
         $stmt = $this->pdo->prepare('SELECT 1 FROM favorites WHERE listing_id = :listing_id AND user_id = :user_id');
@@ -633,7 +624,6 @@ SQL;
 
         return $stmt->fetchColumn() !== false;
     }
-
     private function buildThumbPath(?string $path): ?string
     {
         if ($path === null || $path === '') {

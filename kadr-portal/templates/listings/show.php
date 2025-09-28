@@ -116,7 +116,6 @@ $images = isset($listing['images']) && is_array($listing['images']) ? $listing['
     <?php endif; ?>
     <?php
     $listingId = (int) $listing['id'];
-
     require __DIR__ . '/../components/comments.php';
     require __DIR__ . '/../components/comment-form.php';
     ?>

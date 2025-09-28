@@ -8,6 +8,7 @@ use PDO;
 use RuntimeException;
 use Throwable;
 
+
 use function KadrPortal\Helpers\current_user;
 use function KadrPortal\Helpers\db;
 
@@ -31,14 +32,12 @@ class ApiController
             $offset = ($page - 1) * $limit;
 
             [$whereClause, $bindings, $appliedFilters] = $this->buildFilters($_GET ?? []);
-
             $user = current_user();
             $userId = $user !== null ? (int) $user['id'] : null;
             $favoriteSelect = $userId !== null ? ', (f.id IS NOT NULL) AS is_favorite' : ', FALSE AS is_favorite';
             $favoriteJoin = $userId !== null
                 ? 'LEFT JOIN favorites AS f ON f.listing_id = l.id AND f.user_id = :favorite_user_id'
                 : '';
-
             $sql = <<<SQL
 SELECT
     l.id,
@@ -80,7 +79,6 @@ SQL;
             if ($userId !== null) {
                 $stmt->bindValue(':favorite_user_id', $userId, PDO::PARAM_INT);
             }
-
             $stmt->bindValue(':limit', $limit + 1, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
             $stmt->execute();

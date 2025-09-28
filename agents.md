@@ -83,7 +83,7 @@ kadr-portal/
 - **Сервисы**: `db` (PostgreSQL 15), `php` (php-fpm 8.2), `nginx`.
 - **PHP расширения**: `pdo_pgsql`, `gd`, `intl`, `zip`.
 - **Nginx**: проксирование `.php` на php-fpm через `fastcgi_pass`.
-- **Порты**: nginx на 8080, postgres на 5432.
+- **Порты**: nginx на 8081, postgres на 5432.
 
 ## Команды (ожидаемые в Makefile)
 ```bash

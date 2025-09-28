@@ -63,3 +63,4 @@ CREATE INDEX IF NOT EXISTS idx_listing_comments_listing_id ON listing_comments(l
 CREATE INDEX IF NOT EXISTS idx_favorites_user_listing ON favorites(user_id, listing_id);
 CREATE INDEX IF NOT EXISTS idx_user_messages_recipient_read ON user_messages(recipient_id, is_read);
 CREATE INDEX IF NOT EXISTS idx_user_messages_pair ON user_messages(sender_id, recipient_id);
+
