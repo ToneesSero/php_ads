@@ -41,6 +41,8 @@ class ListingController
         $filters = [];
         $params = [];
 
+        $user = current_user();
+        $userId = $user !== null ? (int) $user['id'] : null;
         $search = trim($_GET['search'] ?? '');
 
         if ($search !== '') {
@@ -84,7 +86,10 @@ class ListingController
         }
 
         $whereClause = $filters !== [] ? 'WHERE ' . implode(' AND ', $filters) : '';
-
+        $favoriteSelect = $userId !== null ? ', (f.id IS NOT NULL) AS is_favorite' : ', FALSE AS is_favorite';
+        $favoriteJoin = $userId !== null
+            ? 'LEFT JOIN favorites AS f ON f.listing_id = l.id AND f.user_id = :favorite_user_id'
+            : '';
         $sql = <<<SQL
 SELECT
     l.id,
@@ -95,6 +100,7 @@ SELECT
     c.name AS category_name,
     u.name AS author_name,
     img.image_path AS main_image_path
+    {$favoriteSelect}
 FROM listings AS l
 LEFT JOIN categories AS c ON c.id = l.category_id
 INNER JOIN users AS u ON u.id = l.user_id
@@ -105,6 +111,7 @@ LEFT JOIN LATERAL (
     ORDER BY is_main DESC, id ASC
     LIMIT 1
 ) AS img ON TRUE
+{$favoriteJoin}
 $whereClause
 ORDER BY l.created_at DESC
 LIMIT :limit OFFSET :offset
@@ -120,7 +127,9 @@ SQL;
 
             $stmt->bindValue($key, $value);
         }
-
+        if ($userId !== null) {
+            $stmt->bindValue(':favorite_user_id', $userId, PDO::PARAM_INT);
+        }
         $stmt->bindValue(':limit', $perPage + 1, PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
         $stmt->execute();
@@ -138,6 +147,7 @@ SQL;
             $thumb = $this->buildThumbPath(is_string($path) ? $path : null);
 
             $listing['main_image_thumb'] = $thumb ?? (is_string($path) ? $path : null);
+            $listing['is_favorite'] = isset($listing['is_favorite']) ? (bool) $listing['is_favorite'] : false;
         }
 
         unset($listing);
@@ -175,6 +185,13 @@ SQL;
             return;
         }
 
+        $user = current_user();
+
+        if ($user !== null) {
+            $listing['is_favorite'] = $this->isListingFavorited($listingId, (int) $user['id']);
+        } else {
+            $listing['is_favorite'] = false;
+        }
         $csrfToken = csrf_token();
 
         header('Content-Type: text/html; charset=utf-8');
@@ -598,7 +615,15 @@ SQL;
 
         return $images;
     }
+    private function isListingFavorited(int $listingId, int $userId): bool
+    {
+        $stmt = $this->pdo->prepare('SELECT 1 FROM favorites WHERE listing_id = :listing_id AND user_id = :user_id');
+        $stmt->bindValue(':listing_id', $listingId, PDO::PARAM_INT);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->execute();
 
+        return $stmt->fetchColumn() !== false;
+    }
     private function buildThumbPath(?string $path): ?string
     {
         if ($path === null || $path === '') {

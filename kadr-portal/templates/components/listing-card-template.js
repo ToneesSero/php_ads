@@ -53,6 +53,53 @@
         `;
     };
 
+    const isAuthenticated = () => {
+        if (!document.body || !document.body.dataset) {
+            return false;
+        }
+
+        return document.body.dataset.auth === '1';
+    };
+
+    const getCsrfToken = () => {
+        const meta = document.querySelector('meta[name="csrf-token"]');
+
+        if (meta) {
+            const token = meta.getAttribute('content');
+
+            if (token) {
+                return token;
+            }
+        }
+
+        return '';
+    };
+
+    const buildFavoriteButton = (listing) => {
+        const favorited = Boolean(listing.is_favorite);
+        const csrfToken = escapeHtml(getCsrfToken());
+        const auth = isAuthenticated();
+        const buttonClasses = ['button', 'button-secondary', 'listing-card-favorite'];
+
+        if (favorited) {
+            buttonClasses.push('listing-card-favorite--active');
+        }
+
+        const requiresAuthAttr = auth ? '' : ' data-requires-auth="1"';
+
+        return `
+            <button type="button"
+                    class="${buttonClasses.join(' ')}"
+                    data-favorite-button
+                    data-listing-id="${escapeHtml(listing.id)}"
+                    data-favorited="${favorited ? '1' : '0'}"
+                    data-csrf="${csrfToken}"
+                    aria-pressed="${favorited ? 'true' : 'false'}"${requiresAuthAttr}>
+                ${favorited ? 'В избранном' : 'В избранное'}
+            </button>
+        `;
+    };
+
     window.renderListingCard = (listing) => {
         const url = escapeHtml(listing.url || `/listings/${listing.id}`);
         const title = escapeHtml(listing.title);
@@ -79,6 +126,7 @@
                 </div>
                 <div class="listing-card-actions">
                     <a class="button button-link" href="${url}">Подробнее</a>
+                    ${buildFavoriteButton(listing)}
                 </div>
             </article>
         `;

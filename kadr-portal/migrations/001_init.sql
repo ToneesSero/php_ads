@@ -46,8 +46,21 @@ CREATE TABLE IF NOT EXISTS favorites (
     UNIQUE (user_id, listing_id)
 );
 
+CREATE TABLE IF NOT EXISTS user_messages (
+    id SERIAL PRIMARY KEY,
+    sender_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    recipient_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    listing_id INTEGER REFERENCES listings(id) ON DELETE SET NULL,
+    message_text TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 CREATE INDEX IF NOT EXISTS idx_listings_user_id ON listings(user_id);
 CREATE INDEX IF NOT EXISTS idx_listings_category_id ON listings(category_id);
 CREATE INDEX IF NOT EXISTS idx_listing_images_listing_id ON listing_images(listing_id);
 CREATE INDEX IF NOT EXISTS idx_listing_comments_listing_id ON listing_comments(listing_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_user_listing ON favorites(user_id, listing_id);
+CREATE INDEX IF NOT EXISTS idx_user_messages_recipient_read ON user_messages(recipient_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_user_messages_pair ON user_messages(sender_id, recipient_id);
+

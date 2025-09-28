@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 use function KadrPortal\Helpers\is_authenticated;
 
+$isAuthenticated = is_authenticated();
 $searchValue = $currentFilters['search'] ?? '';
 $categoryValue = $currentFilters['category'] ?? null;
 $minPriceValue = $currentFilters['min_price'] !== null ? number_format((float) $currentFilters['min_price'], 2, '.', '') : '';
@@ -43,10 +44,11 @@ $baseQuery = http_build_query($filterQuery);
     <meta charset="UTF-8">
     <title>Объявления — Kadr Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars($csrfToken, ENT_QUOTES, 'UTF-8'); ?>">
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/loading.css">
 </head>
-<body>
+<body data-auth="<?= $isAuthenticated ? '1' : '0'; ?>">
 <?php require __DIR__ . '/../../components/header.php'; ?>
 <main class="container listings-page">
     <section class="listings-header">
@@ -118,5 +120,6 @@ $baseQuery = http_build_query($filterQuery);
 </script>
 <script src="/assets/js/listings.js" defer></script>
 <script src="/assets/js/infinite-scroll.js" defer></script>
+<script src="/assets/js/favorites.js" defer></script>
 </body>
 </html>

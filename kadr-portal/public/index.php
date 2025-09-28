@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 
+
 // Настройка сессии
 $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
 session_set_cookie_params([
@@ -16,27 +17,31 @@ session_set_cookie_params([
 
 session_start();
 
+
 // Подключение всех необходимых файлов
 require_once __DIR__ . '/../helpers/router.php';
 require_once __DIR__ . '/../helpers/auth.php';
 require_once __DIR__ . '/../helpers/csrf.php';
 require_once __DIR__ . '/../helpers/validation.php';
-
 require_once __DIR__ . '/../helpers/image.php';
 require_once __DIR__ . '/../helpers/upload.php';
 require_once __DIR__ . '/../helpers/database.php';
+require_once __DIR__ . '/../helpers/messages.php';
 require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/ListingController.php';
 require_once __DIR__ . '/../controllers/UploadController.php';
 require_once __DIR__ . '/../controllers/ApiController.php';
 require_once __DIR__ . '/../controllers/CommentController.php';
-
+require_once __DIR__ . '/../controllers/FavoriteController.php';
+require_once __DIR__ . '/../controllers/MessageController.php';
 
 use KadrPortal\Controllers\AuthController;
 use KadrPortal\Controllers\ListingController;
 use KadrPortal\Controllers\UploadController;
 use KadrPortal\Controllers\ApiController;
 use KadrPortal\Controllers\CommentController;
+use KadrPortal\Controllers\FavoriteController;
+use KadrPortal\Controllers\MessageController;
 use KadrPortal\Helpers\Router;
 
 $router = new Router();
@@ -44,8 +49,9 @@ $authController = new AuthController();
 $listingController = new ListingController();
 $uploadController = new UploadController();
 $apiController = new ApiController();
-
 $commentController = new CommentController();
+$favoriteController = new FavoriteController();
+$messageController = new MessageController();
 
 
 $router->get('/', static function (): void {
@@ -53,14 +59,12 @@ $router->get('/', static function (): void {
     echo 'Welcome to Kadr Portal';
 });
 
-
 // Маршруты авторизации
 $router->get('/login', [$authController, 'showLogin']);
 $router->post('/login', [$authController, 'login']);
 $router->get('/register', [$authController, 'showRegister']);
 $router->post('/register', [$authController, 'register']);
 $router->post('/logout', [$authController, 'logout']);
-
 
 $router->get('/listings', [$listingController, 'index']);
 $router->get('/listings/create', [$listingController, 'create']);
@@ -76,5 +80,11 @@ $router->post('/api/upload/delete', [$uploadController, 'destroy']);
 $router->get('/api/comments/{listingId}', [$commentController, 'index']);
 $router->post('/api/comments', [$commentController, 'store']);
 $router->post('/api/comments/{id}/delete', [$commentController, 'destroy']);
+$router->get('/favorites', [$favoriteController, 'index']);
+$router->post('/api/favorites', [$favoriteController, 'toggle']);
+$router->get('/messages', [$messageController, 'index']);
+$router->get('/messages/{id}', [$messageController, 'conversation']);
+$router->post('/api/messages', [$messageController, 'store']);
+
 $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $_SERVER['REQUEST_URI'] ?? '/');
 
