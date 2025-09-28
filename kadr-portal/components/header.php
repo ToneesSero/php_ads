@@ -13,7 +13,7 @@ $unreadMessages = is_authenticated() ? unread_messages_count() : 0;
 ?>
 <header class="site-header">
     <div class="container header-inner">
-        <a class="logo" href="/">Kadr Portal</a>
+        <a class="logo" href="/listings">Kadr Portal</a>
         <nav class="main-nav">
             <ul>
                 <li class="nav-item"><a href="/listings">Объявления</a></li>

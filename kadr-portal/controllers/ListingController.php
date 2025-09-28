@@ -252,8 +252,15 @@ SQL;
         }
 
         try {
+            $this->pdo->beginTransaction();
+            
             $listingId = $this->createListing($user['id'], $data);
+            $this->saveUploadedImages($listingId);
+            $this->clearSessionUploads();
+            
+            $this->pdo->commit();
         } catch (Throwable $exception) {
+            $this->pdo->rollBack();
             $this->rememberFormState($formState, 'listing_create_errors', [
                 'general' => 'Не удалось создать объявление. Попробуйте позже.',
             ]);
@@ -299,9 +306,14 @@ SQL;
         $old = old_input();
         $categories = $this->getCategories();
         $csrfToken = csrf_token();
+        
+        // Загружаем существующие изображения в сессию для редактора
+        $this->loadExistingImagesIntoSession($listingId);
+        
         $uploadedImages = get_listing_uploads();
         $uploadLimit = get_listing_upload_limit();
         $uploadMaxSize = get_listing_upload_max_size();
+        
         header('Content-Type: text/html; charset=utf-8');
         require __DIR__ . '/../templates/listings/edit.php';
     }
@@ -364,8 +376,15 @@ SQL;
         }
 
         try {
+            $this->pdo->beginTransaction();
+            
             $this->updateListing($listingId, $user['id'], $data);
+            $this->updateListingImages($listingId);
+            $this->clearSessionUploads();
+            
+            $this->pdo->commit();
         } catch (Throwable $exception) {
+            $this->pdo->rollBack();
             $this->rememberFormState($formState, 'listing_edit_errors', [
                 'general' => 'Не удалось обновить объявление. Попробуйте позже.',
             ]);
@@ -412,6 +431,62 @@ SQL;
 
         reset_csrf_token();
         header('Location: /listings', true, 303);
+    }
+
+    private function saveUploadedImages(int $listingId): void
+    {
+        $uploads = get_listing_uploads();
+        
+        if (empty($uploads)) {
+            return;
+        }
+
+        foreach ($uploads as $index => $upload) {
+            $stmt = $this->pdo->prepare(
+                'INSERT INTO listing_images (listing_id, image_path, is_main) VALUES (:listing_id, :path, :is_main)'
+            );
+            
+            $stmt->bindValue(':listing_id', $listingId, PDO::PARAM_INT);
+            $stmt->bindValue(':path', $upload['path']);
+            $stmt->bindValue(':is_main', $index === 0, PDO::PARAM_BOOL); // Первое изображение как основное
+            $stmt->execute();
+        }
+    }
+
+    private function updateListingImages(int $listingId): void
+    {
+        // Удаляем старые изображения
+        $stmt = $this->pdo->prepare('DELETE FROM listing_images WHERE listing_id = :listing_id');
+        $stmt->bindValue(':listing_id', $listingId, PDO::PARAM_INT);
+        $stmt->execute();
+        
+        // Сохраняем новые
+        $this->saveUploadedImages($listingId);
+    }
+
+    private function loadExistingImagesIntoSession(int $listingId): void
+    {
+        $images = $this->getListingImages($listingId);
+        
+        // Очищаем текущую сессию
+        $this->clearSessionUploads();
+        
+        // Загружаем существующие изображения в сессию
+        foreach ($images as $image) {
+            $upload = [
+                'id' => basename($image['path']),
+                'path' => $image['path'],
+                'thumb' => $image['thumb']
+            ];
+            
+            \KadrPortal\Helpers\remember_listing_upload($upload);
+        }
+    }
+
+    private function clearSessionUploads(): void
+    {
+        \KadrPortal\Helpers\ensureSession();
+        unset($_SESSION['listing_uploads']);
     }
 
     private function ensureAuthenticated(): bool

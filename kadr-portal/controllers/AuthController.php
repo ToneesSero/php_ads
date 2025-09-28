@@ -33,7 +33,7 @@ class AuthController
     public function showLogin(): void
     {
         if (is_authenticated()) {
-            header('Location: /', true, 303);
+            header('Location: /listings', true, 303);
             return;
         }
 
@@ -50,7 +50,7 @@ class AuthController
     public function showRegister(): void
     {
         if (is_authenticated()) {
-            header('Location: /', true, 303);
+            header('Location: /listings', true, 303);
             return;
         }
 
@@ -104,7 +104,7 @@ class AuthController
         ]);
 
         reset_csrf_token();
-        header('Location: /', true, 303);
+        header('Location: /listings', true, 303);
     }
 
     public function login(): void
@@ -161,7 +161,7 @@ class AuthController
 
         logout_user();
         reset_csrf_token();
-        header('Location: /', true, 303);
+        header('Location: /listings', true, 303);
     }
 
     /**

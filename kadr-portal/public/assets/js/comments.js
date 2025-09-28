@@ -22,6 +22,7 @@
         const statusElement = document.querySelector('[data-comment-status]');
 
         if (!listingId || !listElement || !emptyElement || !loaderElement || !errorElement || !showNewButton || !newCountElement) {
+            console.error('Comments: required elements not found');
             return;
         }
 
@@ -30,10 +31,16 @@
         let pollTimer = null;
 
         function setLoading(isLoading) {
-            loaderElement.hidden = !isLoading;
+            if (loaderElement) {
+                loaderElement.hidden = !isLoading;
+            }
         }
 
         function setError(message) {
+            if (!errorElement) {
+                return;
+            }
+            
             if (!message) {
                 errorElement.hidden = true;
                 errorElement.textContent = '';
@@ -305,19 +312,28 @@
             });
         }
 
+        // Инициализация комментариев
         setLoading(true);
         setError('');
+        
         fetchComments().then(function (data) {
-            if (data && Array.isArray(data.comments)) {
-                appendComments(data.comments);
-                updateLastId(data.comments);
-            }
+            try {
+                if (data && Array.isArray(data.comments)) {
+                    appendComments(data.comments);
+                    updateLastId(data.comments);
+                }
 
-            updateEmptyState();
-            startPolling();
+                updateEmptyState();
+                startPolling();
+            } catch (error) {
+                console.error('Error processing comments:', error);
+                setError('Ошибка при обработке комментариев');
+            }
         }).catch(function (error) {
-            setError(error.message);
+            console.error('Error fetching comments:', error);
+            setError(error.message || 'Ошибка загрузки комментариев');
         }).finally(function () {
+            // Принудительно скрываем индикатор загрузки
             setLoading(false);
         });
 

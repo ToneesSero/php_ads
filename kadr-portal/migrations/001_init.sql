@@ -64,3 +64,19 @@ CREATE INDEX IF NOT EXISTS idx_favorites_user_listing ON favorites(user_id, list
 CREATE INDEX IF NOT EXISTS idx_user_messages_recipient_read ON user_messages(recipient_id, is_read);
 CREATE INDEX IF NOT EXISTS idx_user_messages_pair ON user_messages(sender_id, recipient_id);
 
+-- Тестовые данные для удобства разработки
+INSERT INTO categories (name, slug) VALUES 
+    ('Электроника', 'electronics'),
+    ('Одежда', 'clothing'),
+    ('Автомобили', 'cars'),
+    ('Недвижимость', 'real-estate'),
+    ('Мебель', 'furniture'),
+    ('Книги', 'books'),
+    ('Спорт', 'sport'),
+    ('Услуги', 'services')
+ON CONFLICT (slug) DO NOTHING;
+
+-- Тестовый пользователь (пароль: 12345678)
+INSERT INTO users (email, password_hash, name) VALUES 
+    ('test@example.com', '$argon2id$v=19$m=65536,t=4,p=3$M2dJTGdyVUZBZ3BoT3VsaQ$n7+OKCmCLz7m4vz8i5cJgmKJ0OKMkV9S3rA5O4A8Wxw', 'Тестовый пользователь')
+ON CONFLICT (email) DO NOTHING;

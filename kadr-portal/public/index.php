@@ -55,8 +55,7 @@ $messageController = new MessageController();
 
 
 $router->get('/', static function (): void {
-    header('Content-Type: text/plain; charset=utf-8');
-    echo 'Welcome to Kadr Portal';
+    header('Location: /listings', true, 303);    
 });
 
 // Маршруты авторизации

@@ -36,6 +36,11 @@
     background-color: #e0e0e0;
 }
 
+.comments__notify.hidden,
+.comments__notify[hidden] {
+    display: none !important;
+}
+
 .comments__body {
     position: relative;
 }
@@ -102,9 +107,19 @@
     color: #666;
 }
 
+.comments__empty.hidden,
+.comments__empty[hidden] {
+    display: none !important;
+}
+
 .comments__error {
     margin: 1rem 0 0;
     color: #c62828;
+}
+
+.comments__error.hidden,
+.comments__error[hidden] {
+    display: none !important;
 }
 
 .comments__loader {
@@ -112,6 +127,12 @@
     align-items: center;
     gap: 0.5rem;
     color: #666;
+    margin: 1rem 0;
+}
+
+.comments__loader.hidden,
+.comments__loader[hidden] {
+    display: none !important;
 }
 
 .comments__spinner {
