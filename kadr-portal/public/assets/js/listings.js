@@ -58,6 +58,7 @@ if (listingsPage) {
     };
 }
 
+// Инициализация галереи изображений
 const gallery = document.querySelector('[data-gallery]');
 
 if (gallery) {
@@ -66,17 +67,31 @@ if (gallery) {
     const prevButton = gallery.querySelector('[data-gallery-prev]');
     const nextButton = gallery.querySelector('[data-gallery-next]');
 
+    console.log('Gallery found with', items.length, 'items');
+
+    // Если изображений 1 или меньше - скрываем обе кнопки
     if (items.length <= 1) {
         if (prevButton instanceof HTMLButtonElement) {
-            prevButton.hidden = true;
+            prevButton.style.display = 'none';
         }
-
         if (nextButton instanceof HTMLButtonElement) {
-            nextButton.hidden = true;
+            nextButton.style.display = 'none';
         }
+        console.log('Gallery controls hidden - only', items.length, 'images');
+    } else {
+        // Убираем hidden атрибут и показываем обе кнопки для галереи с несколькими изображениями
+        if (prevButton instanceof HTMLButtonElement) {
+            prevButton.removeAttribute('hidden');
+            prevButton.style.display = 'flex';
+        }
+        if (nextButton instanceof HTMLButtonElement) {
+            nextButton.removeAttribute('hidden');
+            nextButton.style.display = 'flex';
+        }
+        console.log('Gallery controls shown for', items.length, 'images');
     }
 
-    if (track && items.length > 0) {
+    if (track && items.length > 1) {
         let currentIndex = 0;
 
         const setActive = (index) => {
@@ -104,11 +119,13 @@ if (gallery) {
             if (prevButton instanceof HTMLButtonElement) {
                 prevButton.disabled = currentIndex <= 0;
                 prevButton.style.opacity = currentIndex <= 0 ? '0.5' : '1';
+                console.log('Prev button - disabled:', prevButton.disabled, 'index:', currentIndex);
             }
 
             if (nextButton instanceof HTMLButtonElement) {
                 nextButton.disabled = currentIndex >= items.length - 1;
                 nextButton.style.opacity = currentIndex >= items.length - 1 ? '0.5' : '1';
+                console.log('Next button - disabled:', nextButton.disabled, 'index:', currentIndex, 'max:', items.length - 1);
             }
         };
 
@@ -126,20 +143,19 @@ if (gallery) {
             }
         };
 
-        // Удаляем старые обработчики и добавляем новые
+        // Привязываем обработчики событий
         if (prevButton instanceof HTMLButtonElement) {
-            prevButton.removeEventListener('click', showPrev);
             prevButton.addEventListener('click', showPrev);
+            console.log('Prev button event listener added');
         }
 
         if (nextButton instanceof HTMLButtonElement) {
-            nextButton.removeEventListener('click', showNext);
             nextButton.addEventListener('click', showNext);
+            console.log('Next button event listener added');
         }
 
         // Инициализируем первый слайд
         setActive(0);
-        
-        console.log('Gallery initialized with', items.length, 'items');
+        console.log('Gallery initialized with index 0');
     }
 }

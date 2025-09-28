@@ -322,6 +322,7 @@ h3 {
 }
 
 .gallery-control {
+    z-index: 3;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -347,6 +348,14 @@ h3 {
 .gallery-control[disabled] {
     opacity: 0.4;
     cursor: not-allowed;
+}
+.gallery-control[disabled]:hover,
+.gallery-control[disabled]:focus-visible {
+    background: rgba(17, 24, 39, 0.6);
+}
+
+.gallery-control[hidden] {
+    display: none !important;
 }
 
 .gallery-control[hidden] {
