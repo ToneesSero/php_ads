@@ -54,6 +54,7 @@
    docker compose -f docker-compose.laravel.yml exec laravel-php php /var/www/html/artisan key:generate
    ```
 5. Проверьте, что Nginx отвечает на новом порту:
+
    ```bash
    curl http://localhost:8082
    ```
