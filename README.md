@@ -30,6 +30,26 @@
    curl http://localhost:8081/listings
    ```
 
+## Laravel board окружение
+
+1. Скопируйте настройки окружения будущего Laravel приложения:
+   ```bash
+   cp laravel-board/.env.example laravel-board/.env
+   ```
+2. Соберите и поднимите инфраструктуру Laravel доски объявлений:
+   ```bash
+   docker compose -f docker-compose.laravel.yml up -d --build
+   ```
+   При первом запуске PHP-контейнер автоматически скачает свежий шаблон `laravel/laravel` и развернёт его в каталоге `laravel-board`. Скрипт не перетирает ваши `.env` файлы и дополнительные папки.
+3. После завершения установки сгенерируйте ключ приложения (команда внутри контейнера теперь доступна):
+   ```bash
+   docker compose -f docker-compose.laravel.yml exec laravel-php php artisan key:generate
+   ```
+4. Проверьте, что Nginx отвечает на новом порту:
+   ```bash
+   curl http://localhost:8082
+   ```
+
 ## Полезные команды
 ```bash
 make up       # Поднять контейнеры
