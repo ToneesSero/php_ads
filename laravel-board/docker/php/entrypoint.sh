@@ -53,4 +53,5 @@ fi
 if [ ! -f "$laravel_marker" ]; then
     echo "[entrypoint] artisan is still missing. Please run 'composer create-project laravel/laravel .' manually." >&2
 fi
+
 exec docker-php-entrypoint "$@"

@@ -20,3 +20,4 @@ Homestead.json
 /.vscode/
 .DS_Store
 /bootstrap/cache/*.php
+
