@@ -30,6 +30,21 @@
    curl http://localhost:8081/listings
    ```
 
+## Laravel board окружение
+
+1. Скопируйте настройки окружения будущего Laravel приложения:
+   ```bash
+   cp laravel-board/.env.example laravel-board/.env
+   ```
+2. Соберите и поднимите инфраструктуру Laravel доски объявлений:
+   ```bash
+   docker compose -f docker-compose.laravel.yml up -d --build
+   ```
+3. Проверьте, что Nginx отвечает на новом порту:
+   ```bash
+   curl http://localhost:8082
+   ```
+
 ## Полезные команды
 ```bash
 make up       # Поднять контейнеры
