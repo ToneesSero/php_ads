@@ -1,0 +1,46 @@
+services:
+  laravel-db:
+    image: postgres:15
+    container_name: laravel_board_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${LARAVEL_DB_DATABASE:-laravel}
+      POSTGRES_USER: ${LARAVEL_DB_USERNAME:-laravel}
+      POSTGRES_PASSWORD: ${LARAVEL_DB_PASSWORD:-secret}
+    volumes:
+      - laravel_db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  laravel-php:
+    build:
+      context: ./laravel-board/docker/php
+    container_name: laravel_board_php
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./laravel-board:/var/www/html
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      DB_HOST: laravel-db
+      DB_PORT: 5432
+      DB_DATABASE: ${LARAVEL_DB_DATABASE:-laravel}
+      DB_USERNAME: ${LARAVEL_DB_USERNAME:-laravel}
+      DB_PASSWORD: ${LARAVEL_DB_PASSWORD:-secret}
+    depends_on:
+      - laravel-db
+
+  laravel-nginx:
+    image: nginx:1.25-alpine
+    container_name: laravel_board_nginx
+    restart: unless-stopped
+    volumes:
+      - ./laravel-board/public:/var/www/html/public
+      - ./laravel-board/docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "8082:80"
+    depends_on:
+      - laravel-php
+
+volumes:
+  laravel_db_data:
