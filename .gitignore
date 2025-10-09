@@ -1,0 +1,18 @@
+# Global ignores
+.env
+.env.local
+.env.backup
+/vendor/
+/node_modules/
+
+# Laravel board specific
+laravel-board/vendor/
+laravel-board/node_modules/
+laravel-board/storage/*.key
+laravel-board/.env
+laravel-board/.env.backup
+laravel-board/.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
