@@ -40,7 +40,6 @@ class ListingController extends Controller
                 $this->formatPrice($maxPrice),
             ];
         }
-
         $categories = Schema::hasTable('categories')
             ? Category::orderBy('name')->get()
             : collect();
@@ -75,7 +74,6 @@ class ListingController extends Controller
         if ($categoryId !== null) {
             $query->where('category_id', $categoryId);
         }
-
         if ($minPrice !== null) {
             $query->where('price', '>=', $minPrice);
         }
@@ -88,7 +86,6 @@ class ListingController extends Controller
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
-
         return view('listings.index', compact('listings', 'categories', 'filters'));
     }
 
@@ -202,7 +199,6 @@ class ListingController extends Controller
             abort(403, 'Недостаточно прав для выполнения действия.');
         }
     }
-
     private function emptyPaginator(Request $request): LengthAwarePaginator
     {
         return new LengthAwarePaginator(
