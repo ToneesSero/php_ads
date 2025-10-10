@@ -79,7 +79,6 @@
                                     <img src="{{ asset('storage/' . ($mainImage->thumbnail_path ?? $mainImage->image_path)) }}"
                                         class="card-img-top" alt="Превью объявления">
                                 @endif
-
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start gap-3">
                                         <div>
