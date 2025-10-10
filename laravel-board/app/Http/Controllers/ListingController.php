@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ListingRequest;
 use App\Models\Category;
 use App\Models\Listing;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Schema;
 
 class ListingController extends Controller
 {
@@ -18,29 +20,12 @@ class ListingController extends Controller
 
     public function index(Request $request)
     {
-        $query = Listing::query()
-            ->with(['category', 'user'])
-            ->where('status', 'active');
-
         $search = trim((string) $request->query('search', ''));
 
-        if ($search !== '') {
-            $searchTerm = Str::lower($search);
-
-            $query->where(function ($builder) use ($searchTerm) {
-                $builder
-                    ->whereRaw('LOWER(title) LIKE ?', ['%' . $searchTerm . '%'])
-                    ->orWhereRaw('LOWER(description) LIKE ?', ['%' . $searchTerm . '%']);
-            });
-        }
-
         $categoryFilter = trim((string) $request->query('category', ''));
-        $categoryId = null;
-
-        if ($categoryFilter !== '' && ctype_digit($categoryFilter)) {
-            $categoryId = (int) $categoryFilter;
-            $query->where('category_id', $categoryId);
-        }
+        $categoryId = $categoryFilter !== '' && ctype_digit($categoryFilter)
+            ? (int) $categoryFilter
+            : null;
 
         $minPriceInput = trim((string) $request->query('min_price', ''));
         $maxPriceInput = trim((string) $request->query('max_price', ''));
@@ -55,7 +40,40 @@ class ListingController extends Controller
                 $this->formatPrice($maxPrice),
             ];
         }
+        $categories = Schema::hasTable('categories')
+            ? Category::orderBy('name')->get()
+            : collect();
 
+        $filters = [
+            'search' => $search,
+            'category' => $categoryId,
+            'min_price' => $minPriceInput,
+            'max_price' => $maxPriceInput,
+        ];
+
+        if (!Schema::hasTable('listings')) {
+            $listings = $this->emptyPaginator($request);
+
+            return view('listings.index', compact('listings', 'categories', 'filters'));
+        }
+
+        $query = Listing::query()
+            ->with(['category', 'user'])
+            ->where('status', 'active');
+
+        if ($search !== '') {
+            $searchTerm = Str::lower($search);
+
+            $query->where(function ($builder) use ($searchTerm) {
+                $builder
+                    ->whereRaw('LOWER(title) LIKE ?', ['%' . $searchTerm . '%'])
+                    ->orWhereRaw('LOWER(description) LIKE ?', ['%' . $searchTerm . '%']);
+            });
+        }
+
+        if ($categoryId !== null) {
+            $query->where('category_id', $categoryId);
+        }
         if ($minPrice !== null) {
             $query->where('price', '>=', $minPrice);
         }
@@ -68,16 +86,6 @@ class ListingController extends Controller
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
-
-        $categories = Category::orderBy('name')->get();
-
-        $filters = [
-            'search' => $search,
-            'category' => $categoryId,
-            'min_price' => $minPriceInput,
-            'max_price' => $maxPriceInput,
-        ];
-
         return view('listings.index', compact('listings', 'categories', 'filters'));
     }
 
@@ -190,5 +198,18 @@ class ListingController extends Controller
         if ((int) Auth::id() !== (int) $listing->user_id) {
             abort(403, 'Недостаточно прав для выполнения действия.');
         }
+    }
+    private function emptyPaginator(Request $request): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator(
+            [],
+            0,
+            10,
+            LengthAwarePaginator::resolveCurrentPage(),
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
     }
 }
