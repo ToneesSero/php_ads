@@ -6,7 +6,6 @@ use App\Http\Requests\ListingRequest;
 use App\Models\Category;
 use App\Models\Listing;
 use Illuminate\Http\UploadedFile;
-
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

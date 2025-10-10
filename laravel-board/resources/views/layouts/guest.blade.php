@@ -8,7 +8,9 @@
         <title>@yield('title', config('app.name', 'Laravel'))</title>
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        @vite(['resources/js/app.js'])
+        @if (file_exists(public_path('build/manifest.json')))
+            @vite(['resources/js/app.js'])
+        @endif
     </head>
     <body class="bg-light d-flex align-items-center min-vh-100">
         <div class="container">

@@ -44,6 +44,7 @@
             @endforeach
         </div>
     @endif
+
     <div class="card mb-4">
         <div class="card-body">
             {!! nl2br(e($listing->description)) !!}
