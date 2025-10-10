@@ -96,7 +96,6 @@
                     </div>
                 </div>
             </nav>
-
             <main class="flex-fill py-4">
                 <div class="container">
                     @yield('content')
