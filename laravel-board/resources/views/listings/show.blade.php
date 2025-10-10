@@ -13,7 +13,6 @@
             {{ session('status') }}
         </div>
     @endif
-
     @php
         $mainImage = $listing->images->firstWhere('is_main', true) ?? $listing->images->first();
     @endphp
@@ -24,7 +23,6 @@
                 class="img-fluid rounded shadow-sm w-100" style="max-height: 400px; object-fit: cover;">
         </div>
     @endif
-
     <div class="text-muted small mb-3">
         <span>Категория: {{ $listing->category?->name ?? 'Без категории' }}</span>
         <span class="mx-2">•</span>
@@ -46,7 +44,6 @@
             @endforeach
         </div>
     @endif
-
     <div class="card mb-4">
         <div class="card-body">
             {!! nl2br(e($listing->description)) !!}
