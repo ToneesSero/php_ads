@@ -8,7 +8,7 @@
             <div class="card shadow-sm">
                 <div class="card-header">Новое объявление</div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('listings.store') }}" class="vstack gap-3">
+                    <form method="POST" action="{{ route('listings.store') }}" class="vstack gap-3" enctype="multipart/form-data">
                         @csrf
 
                         <div>
@@ -56,6 +56,18 @@
                             </div>
                         </div>
 
+                        <div>
+                            <label for="images" class="form-label">Фотографии</label>
+                            <input class="form-control" type="file" name="images[]" id="images" multiple
+                                accept=".jpg,.jpeg,.png">
+                            <div class="form-text">До {{ \App\Http\Controllers\ListingController::MAX_IMAGES }} файлов в формате JPG или PNG, размером до 5 МБ каждый.</div>
+                            @error('images')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                            @error('images.*')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
                             <a class="btn btn-outline-secondary" href="{{ route('listings.index') }}">Отмена</a>
                             <button type="submit" class="btn btn-primary">Сохранить</button>

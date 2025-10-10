@@ -71,6 +71,14 @@
                     @foreach ($listings as $listing)
                         <div class="col">
                             <div class="card h-100 shadow-sm">
+                                @php
+                                    $mainImage = $listing->images->firstWhere('is_main', true) ?? $listing->images->first();
+                                @endphp
+
+                                @if ($mainImage)
+                                    <img src="{{ asset('storage/' . ($mainImage->thumbnail_path ?? $mainImage->image_path)) }}"
+                                        class="card-img-top" alt="Превью объявления">
+                                @endif
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start gap-3">
                                         <div>

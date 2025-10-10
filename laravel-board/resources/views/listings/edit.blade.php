@@ -8,7 +8,7 @@
             <div class="card shadow-sm">
                 <div class="card-header">Редактирование</div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('listings.update', $listing) }}" class="vstack gap-3">
+                    <form method="POST" action="{{ route('listings.update', $listing) }}" class="vstack gap-3" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -58,6 +58,38 @@
                             </div>
                         </div>
 
+                        @if ($listing->images->isNotEmpty())
+                            <div class="border rounded p-3 bg-light-subtle">
+                                <div class="fw-semibold mb-2">Текущие фотографии</div>
+                                <div class="d-flex flex-wrap gap-3">
+                                    @foreach ($listing->images as $image)
+                                        <div class="text-center">
+                                            <img src="{{ asset('storage/' . ($image->thumbnail_path ?? $image->image_path)) }}"
+                                                alt="Превью объявления" class="img-thumbnail" width="150" height="100">
+                                            @if ($image->is_main)
+                                                <div class="small text-primary mt-1">Главное фото</div>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
+                        <div>
+                            <label for="images" class="form-label">Добавить новые фотографии</label>
+                            <input class="form-control" type="file" name="images[]" id="images" multiple
+                                accept=".jpg,.jpeg,.png">
+                            @php
+                                $remainingSlots = max(\App\Http\Controllers\ListingController::MAX_IMAGES - $listing->images->count(), 0);
+                            @endphp
+                            <div class="form-text">Можно добавить до {{ $remainingSlots }} файлов за раз, общий лимит — {{ \App\Http\Controllers\ListingController::MAX_IMAGES }} фото.</div>
+                            @error('images')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                            @error('images.*')
+                                <div class="text-danger small">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-between">
                             <a class="btn btn-outline-secondary" href="{{ route('listings.show', $listing) }}">Назад</a>
                             <div class="d-flex flex-column flex-md-row gap-2">

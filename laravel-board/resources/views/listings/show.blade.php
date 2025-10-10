@@ -13,7 +13,16 @@
             {{ session('status') }}
         </div>
     @endif
+    @php
+        $mainImage = $listing->images->firstWhere('is_main', true) ?? $listing->images->first();
+    @endphp
 
+    @if ($mainImage)
+        <div class="mb-4">
+            <img src="{{ asset('storage/' . $mainImage->image_path) }}" alt="Главное фото объявления"
+                class="img-fluid rounded shadow-sm w-100" style="max-height: 400px; object-fit: cover;">
+        </div>
+    @endif
     <div class="text-muted small mb-3">
         <span>Категория: {{ $listing->category?->name ?? 'Без категории' }}</span>
         <span class="mx-2">•</span>
@@ -22,6 +31,19 @@
         <span>Создано: {{ $listing->created_at?->format('d.m.Y H:i') }}</span>
     </div>
 
+    @if ($listing->images->count() > 1)
+        <div class="row g-3 mb-4">
+            @foreach ($listing->images as $image)
+                <div class="col-6 col-md-3">
+                    <a href="{{ asset('storage/' . $image->image_path) }}" class="d-block" target="_blank">
+                        <img src="{{ asset('storage/' . ($image->thumbnail_path ?? $image->image_path)) }}"
+                            alt="Фотография объявления"
+                            class="img-fluid rounded border @if ($image->is_main) border-primary border-2 @else border-light @endif">
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    @endif
     <div class="card mb-4">
         <div class="card-body">
             {!! nl2br(e($listing->description)) !!}

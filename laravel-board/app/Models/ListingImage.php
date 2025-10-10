@@ -12,6 +12,7 @@ class ListingImage extends Model
     protected $fillable = [
         'listing_id',
         'image_path',
+        'thumbnail_path',
         'is_main',
     ];
 

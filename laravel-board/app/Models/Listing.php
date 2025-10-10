@@ -38,7 +38,9 @@ class Listing extends Model
 
     public function images()
     {
-        return $this->hasMany(ListingImage::class);
+        return $this->hasMany(ListingImage::class)
+            ->orderByDesc('is_main')
+            ->orderBy('id');
     }
 
     public function comments()

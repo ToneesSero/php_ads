@@ -18,6 +18,8 @@ class ListingRequest extends FormRequest
             'description' => ['required', 'string'],
             'price' => ['required', 'numeric', 'min:0'],
             'category_id' => ['nullable', 'integer', 'exists:categories,id'],
+            'images' => ['nullable', 'array', 'max:5'],
+            'images.*' => ['file', 'mimes:jpg,jpeg,png', 'max:5120'],
         ];
     }
 
