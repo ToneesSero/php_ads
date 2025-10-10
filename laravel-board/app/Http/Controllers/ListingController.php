@@ -45,7 +45,6 @@ class ListingController extends Controller
                 $this->formatPrice($maxPrice),
             ];
         }
-
         $categories = Schema::hasTable('categories')
             ? Category::orderBy('name')->get()
             : collect();
@@ -62,7 +61,6 @@ class ListingController extends Controller
 
             return view('listings.index', compact('listings', 'categories', 'filters'));
         }
-
         $relations = ['category', 'user'];
         $hasImageTable = Schema::hasTable('listing_images');
 
@@ -87,7 +85,6 @@ class ListingController extends Controller
         if ($categoryId !== null) {
             $query->where('category_id', $categoryId);
         }
-
         if ($minPrice !== null) {
             $query->where('price', '>=', $minPrice);
         }
@@ -100,7 +97,6 @@ class ListingController extends Controller
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
-
         if (!$hasImageTable) {
             $listings->getCollection()->each(static function (Listing $listing) {
                 $listing->setRelation('images', collect());
@@ -113,13 +109,11 @@ class ListingController extends Controller
     public function show(Listing $listing)
     {
         $listing->load(['category', 'user']);
-
         if (Schema::hasTable('listing_images')) {
             $listing->loadMissing('images');
         } else {
             $listing->setRelation('images', collect());
         }
-
         $user = Auth::user();
         $isOwner = $user !== null && (int) $user->id === (int) $listing->user_id;
 
@@ -153,7 +147,6 @@ class ListingController extends Controller
         $listing = Listing::create($data);
 
         $this->storeUploadedImages($listing, $request);
-
         return redirect()
             ->route('listings.show', $listing)
             ->with('status', 'Объявление успешно опубликовано.');
@@ -170,7 +163,6 @@ class ListingController extends Controller
         } else {
             $listing->setRelation('images', collect());
         }
-
         return view('listings.edit', compact('listing', 'categories'));
     }
 
@@ -183,7 +175,6 @@ class ListingController extends Controller
         $listing->update($data);
 
         $this->storeUploadedImages($listing, $request);
-
         return redirect()
             ->route('listings.show', $listing)
             ->with('status', 'Объявление обновлено.');
