@@ -13,7 +13,15 @@
         @endif
     </head>
     <body class="bg-light">
-        @php($unreadMessages = \App\Facades\UnreadMessages::count())
+        @php
+            $unreadMessages = 0;
+
+            try {
+                $unreadMessages = \App\Facades\UnreadMessages::count();
+            } catch (\Throwable $exception) {
+                $unreadMessages = 0;
+            }
+        @endphp
 
         <div id="app" class="min-vh-100 d-flex flex-column">
             <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm">

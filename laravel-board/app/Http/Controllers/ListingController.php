@@ -17,6 +17,7 @@ use Throwable;
 class ListingController extends Controller
 {
     public const MAX_IMAGES = 5;
+
     public function __construct()
     {
         $this->middleware('auth')->except(['index', 'show']);
@@ -184,6 +185,7 @@ class ListingController extends Controller
         $this->ensureOwner($listing);
 
         $this->deleteListingFiles($listing);
+
         $listing->delete();
 
         return redirect()
