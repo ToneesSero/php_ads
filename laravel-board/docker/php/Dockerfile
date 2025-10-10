@@ -21,3 +21,4 @@ RUN chmod +x /usr/local/bin/laravel-entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/laravel-entrypoint.sh"]
 CMD ["php-fpm"]
+

@@ -14,7 +14,26 @@ class ListingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // TODO: добавить правила валидации
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $price = $this->input('price');
+
+        if (is_string($price)) {
+            $price = str_replace(',', '.', $price);
+        }
+
+        $category = $this->input('category_id');
+
+        $this->merge([
+            'price' => $price,
+            'category_id' => $category === null || $category === '' ? null : $category,
+        ]);
     }
 }
