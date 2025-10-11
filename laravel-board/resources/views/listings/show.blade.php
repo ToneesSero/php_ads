@@ -23,6 +23,7 @@
                 class="img-fluid rounded shadow-sm w-100" style="max-height: 400px; object-fit: cover;">
         </div>
     @endif
+
     <div class="text-muted small mb-3">
         <span>Категория: {{ $listing->category?->name ?? 'Без категории' }}</span>
         <span class="mx-2">•</span>

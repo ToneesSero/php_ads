@@ -3,6 +3,29 @@
 @section('title', 'Объявления')
 
 @section('content')
+    @php
+        $filterQuery = [];
+
+        if ($filters['search'] !== '') {
+            $filterQuery['search'] = $filters['search'];
+        }
+
+        if ($filters['category'] !== null) {
+            $filterQuery['category'] = (string) $filters['category'];
+        }
+
+        if ($filters['min_price'] !== '') {
+            $filterQuery['min_price'] = $filters['min_price'];
+        }
+
+        if ($filters['max_price'] !== '') {
+            $filterQuery['max_price'] = $filters['max_price'];
+        }
+
+        $baseQuery = http_build_query($filterQuery);
+        $nextPage = $listings->hasMorePages() ? $listings->currentPage() + 1 : null;
+    @endphp
+
     <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
         <h1 class="h3 mb-0">Объявления</h1>
 
@@ -22,7 +45,7 @@
             <div class="card h-100">
                 <div class="card-header">Фильтры</div>
                 <div class="card-body">
-                    <form method="GET" action="{{ route('listings.index') }}" class="vstack gap-3">
+                    <form method="GET" action="{{ route('listings.index') }}" class="vstack gap-3" data-listings-filter>
                         <div>
                             <label for="search" class="form-label">Поиск</label>
                             <input type="text" name="search" id="search" class="form-control"
@@ -56,7 +79,8 @@
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Применить</button>
-                            <a class="btn btn-outline-secondary" href="{{ route('listings.index') }}">Сбросить</a>
+                            <button type="button" class="btn btn-outline-secondary" data-reset-filters>Сбросить</button>
+
                         </div>
                     </form>
                 </div>
@@ -67,7 +91,12 @@
             @if ($listings->isEmpty())
                 <div class="alert alert-info">Пока нет объявлений, подходящих под выбранные условия.</div>
             @else
-                <div class="row row-cols-1 row-cols-md-2 g-3">
+                <div
+                    class="row row-cols-1 row-cols-md-2 g-3"
+                    data-listings-container
+                    data-next-page="{{ $nextPage ? e($nextPage) : '' }}"
+                    data-base-query="{{ e($baseQuery) }}"
+                >
                     @foreach ($listings as $listing)
                         <div class="col">
                             <div class="card h-100 shadow-sm">
@@ -114,9 +143,29 @@
                 </div>
 
                 <div class="mt-4">
-                    {{ $listings->withQueryString()->links() }}
+                    <div class="text-center" data-loading-indicator hidden>
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Загрузка...</span>
+                        </div>
+                        <p class="text-muted mt-2 mb-0">Загружаем ещё объявления…</p>
+                    </div>
+
+                    <div class="alert alert-danger mt-3" data-loading-error hidden>
+                        Не удалось загрузить объявления. Попробуйте позже.
+                    </div>
+
+                    <div data-pagination>
+                        {{ $listings->withQueryString()->links() }}
+                    </div>
+
+                    <div data-scroll-sentinel class="pt-1" aria-hidden="true"></div>
                 </div>
             @endif
         </div>
     </div>
+@push('scripts')
+    <script src="{{ asset('js/listings.js') }}" defer></script>
+    <script src="{{ asset('js/infinite-scroll.js') }}" defer></script>
+@endpush
+
 @endsection

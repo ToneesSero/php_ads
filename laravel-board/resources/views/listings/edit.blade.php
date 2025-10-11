@@ -90,6 +90,7 @@
                                 <div class="text-danger small">{{ $message }}</div>
                             @enderror
                         </div>
+
                         <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-between">
                             <a class="btn btn-outline-secondary" href="{{ route('listings.show', $listing) }}">Назад</a>
                             <div class="d-flex flex-column flex-md-row gap-2">
