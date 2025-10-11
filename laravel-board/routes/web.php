@@ -19,3 +19,4 @@ Route::middleware('auth')->group(function () {
 Route::resource('listings', ListingController::class);
 
 require __DIR__ . '/auth.php';
+

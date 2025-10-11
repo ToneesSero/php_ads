@@ -184,6 +184,7 @@ class ListingController extends Controller
 
         $this->storeUploadedImages($listing, $request);
 
+
         return redirect()
             ->route('listings.show', $listing)
             ->with('status', 'Объявление обновлено.');
