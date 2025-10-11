@@ -13,7 +13,6 @@
             {{ session('status') }}
         </div>
     @endif
-
     @php
         $mainImage = $listing->images->firstWhere('is_main', true) ?? $listing->images->first();
     @endphp
