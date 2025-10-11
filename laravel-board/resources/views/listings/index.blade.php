@@ -80,7 +80,6 @@
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">Применить</button>
                             <button type="button" class="btn btn-outline-secondary" data-reset-filters>Сбросить</button>
-
                         </div>
                     </form>
                 </div>
@@ -108,6 +107,7 @@
                                     <img src="{{ asset('storage/' . ($mainImage->thumbnail_path ?? $mainImage->image_path)) }}"
                                         class="card-img-top" alt="Превью объявления">
                                 @endif
+
                                 <div class="card-body d-flex flex-column">
                                     <div class="d-flex justify-content-between align-items-start gap-3">
                                         <div>
@@ -167,5 +167,4 @@
     <script src="{{ asset('js/listings.js') }}" defer></script>
     <script src="{{ asset('js/infinite-scroll.js') }}" defer></script>
 @endpush
-
 @endsection

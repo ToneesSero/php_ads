@@ -171,7 +171,6 @@ class ListingController extends Controller
             $listing->setRelation('images', collect());
         }
 
-      
         return view('listings.edit', compact('listing', 'categories'));
     }
 
@@ -185,7 +184,7 @@ class ListingController extends Controller
 
         $this->storeUploadedImages($listing, $request);
 
-      
+
         return redirect()
             ->route('listings.show', $listing)
             ->with('status', 'Объявление обновлено.');

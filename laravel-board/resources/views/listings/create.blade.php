@@ -69,7 +69,6 @@
                             @enderror
                         </div>
 
-
                         <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
                             <a class="btn btn-outline-secondary" href="{{ route('listings.index') }}">Отмена</a>
                             <button type="submit" class="btn btn-primary">Сохранить</button>
